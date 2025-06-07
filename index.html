@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CFA Study Tracker</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>CFA Study Progress Tracker</h1>
+
+        <div class="controls">
+            <label for="cfaLevel">Select CFA Level:</label>
+            <select id="cfaLevel">
+                <option value="I">Level I</option>
+                <option value="II">Level II</option>
+                <option value="III">Level III</option>
+            </select>
+        </div>
+
+        <div class="study-details">
+            <p>Recommended Study Hours: <span id="recommendedHours"></span></p>
+            </div>
+
+        <hr>
+
+        <h2>Mock Exam Progress</h2>
+        <div class="mock-exam-input">
+            <label for="mockScore">Enter Mock Exam Score (0-100):</label>
+            <input type="number" id="mockScore" min="0" max="100">
+            <button id="addMockScore">Add Score</button>
+        </div>
+        <canvas id="mockExamChart"></canvas>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
