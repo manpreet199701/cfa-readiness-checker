@@ -5,60 +5,116 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CFA Certification Readiness Checker</title>
     <style>
+        /* Updated Color Palette for more vibrancy and study-friendliness */
         :root {
-            --primary-color: #007bff;
-            --secondary-color: #6c757d;
-            --success-color: #28a745;
-            --warning-color: #ffc107;
-            --danger-color: #dc3545;
-            --light-color: #f8f9fa;
-            --dark-color: #343a40;
-            --track-color: #e9ecef;
-            --checkpoint-default-color: #adb5bd;
+            --primary-color: #4A90E2; /* Vibrant Blue */
+            --primary-light: #87CEEB; /* Lighter shade of primary for gradients */
+            --secondary-color: #6B7280; /* Darker grey for accents */
+            --success-color: #4CAF50; /* Green for success */
+            --warning-color: #FFC107; /* Amber for warning */
+            --danger-color: #F44336; /* Red for danger */
+            --light-bg-color-start: #E6F0F8; /* Very light blue-grey for body gradient start */
+            --light-bg-color-end: #F8F8F8;   /* Light grey for body gradient end */
+            --card-bg-color: #FFFFFF; /* White for card backgrounds */
+            --text-color: #333333; /* Darker text for readability */
+            --track-color: #DDE2E7; /* Light grey for track line */
+            --checkpoint-default-color: #B0BEC5; /* Muted grey for checkpoints */
             --checkpoint-met-color: var(--success-color);
+            --border-color: #D3DCE6; /* Slightly more distinct border */
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             line-height: 1.6;
             margin: 0;
             padding: 20px;
-            background-color: var(--light-color);
-            color: var(--dark-color);
+            /* Added a subtle linear gradient background to the body */
+            background: linear-gradient(to bottom right, var(--light-bg-color-start), var(--light-bg-color-end));
+            color: var(--text-color);
             display: flex;
             flex-direction: column;
             align-items: center;
+            min-height: 100vh; /* Ensure background covers full viewport height */
         }
 
         .container {
-            background-color: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            background-color: var(--card-bg-color);
+            padding: 30px; /* Increased padding */
+            border-radius: 12px; /* More rounded corners */
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08); /* Enhanced shadow for depth */
             width: 100%;
-            max-width: 800px;
+            max-width: 850px; /* Slightly wider */
+            box-sizing: border-box; /* Include padding in width */
         }
 
         h1 {
-            color: var(--primary-color);
+            color: #FFFFFF; /* White text for contrast against background image/gradient */
             text-align: center;
-            margin-bottom: 20px;
+            margin-bottom: 25px; /* More space */
+            font-size: 2.2em; /* Larger title */
+            font-weight: 700; /* Bolder */
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.6); /* Stronger text shadow for readability */
+            padding: 25px 0; /* Increased padding to give space for gradient */
+            border-radius: 8px; /* Rounded corners for the headline box */
+            /* Using a vibrant linear gradient for the headline background */
+            background: linear-gradient(to right, #4A90E2, #7B68EE); /* Blue to MediumPurple gradient */
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
+
+        /* Controls (Select Level) */
+        .controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        .controls label {
+            font-weight: 600; /* Semi-bold */
+            color: var(--primary-color);
+            margin-right: 15px; /* More space */
+            font-size: 1.1em;
+        }
+        .controls select {
+            padding: 10px 15px; /* Increased padding */
+            border-radius: 8px; /* More rounded */
+            border: 1px solid var(--border-color);
+            background-color: var(--card-bg-color);
+            font-size: 1em;
+            color: var(--text-color);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: all 0.2s ease;
+        }
+        .controls select:focus {
+            border-color: var(--primary-color);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2); /* Soft focus glow */
+        }
+
 
         /* Metaphor Area */
         .metaphor-area {
-            margin-bottom: 30px;
-            padding: 20px;
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            background-color: #f9f9f9;
+            margin-bottom: 40px; /* More spacing */
+            padding: 25px; /* Increased padding */
+            border: 1px solid var(--border-color);
+            border-radius: 10px; /* More rounded */
+            /* Added a subtle gradient background to the metaphor area */
+            background: linear-gradient(to top left, #F8F8F8, #F0F4F8); 
+            box-shadow: inset 0 0 8px rgba(0,0,0,0.03); /* Subtle inner shadow */
+        }
+        .metaphor-area p {
+            font-size: 1.05em;
+            color: var(--secondary-color);
+            margin-bottom: 20px;
         }
 
         .track-container {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 10px 0;
+            padding: 15px 0;
             position: relative;
             margin-bottom: 10px;
         }
@@ -68,10 +124,11 @@
             left: 5%;
             right: 5%;
             top: 50%;
-            height: 6px;
+            height: 8px; /* Thicker line */
             background-color: var(--track-color);
             z-index: 1;
             transform: translateY(-50%);
+            border-radius: 4px; /* Rounded line ends */
         }
 
         .track-point {
@@ -79,38 +136,48 @@
             flex-direction: column;
             align-items: center;
             text-align: center;
-            font-size: 0.8em;
+            font-size: 0.85em;
             color: var(--secondary-color);
             position: relative;
             z-index: 2;
-            width: 20%; /* Approximate for 5 points */
+            width: 18%; /* Adjusted for 6 points */
+            transition: transform 0.3s ease; /* Smooth transition for hover/met */
+        }
+        .track-point:hover {
+            transform: translateY(-3px); /* Subtle lift on hover */
         }
         
         .track-point .icon {
-            width: 20px;
-            height: 20px;
+            width: 32px; /* Larger icons */
+            height: 32px;
             border-radius: 50%;
             background-color: var(--checkpoint-default-color);
-            border: 2px solid #fff;
-            box-shadow: 0 0 5px rgba(0,0,0,0.2);
-            margin-bottom: 5px;
+            border: 3px solid var(--card-bg-color); /* Thicker white border */
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15); /* More prominent shadow */
+            margin-bottom: 8px; /* More space */
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
             font-weight: bold;
+            font-size: 1.1em;
+            transition: all 0.3s ease; /* Smooth transition for met state */
         }
         .track-point.start .icon, .track-point.finish .icon {
             background-color: var(--primary-color);
-            width: 24px;
-            height: 24px;
+            width: 36px; /* Slightly larger start/finish */
+            height: 36px;
+            box-shadow: 0 6px 15px rgba(74, 144, 226, 0.4); /* Blue glow */
         }
         .track-point.checkpoint.met .icon {
             background-color: var(--checkpoint-met-color);
+            transform: scale(1.1); /* Pop effect on met */
+            box-shadow: 0 6px 15px rgba(76, 175, 80, 0.4); /* Green glow */
         }
         .track-point .label {
-            margin-top: 4px;
-            font-weight: bold;
+            margin-top: 5px;
+            font-weight: 600; /* Semi-bold */
+            color: var(--text-color);
         }
 
 
@@ -118,7 +185,8 @@
         .inputs-area {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 20px;
+            gap: 25px; /* Increased gap */
+            margin-bottom: 40px;
         }
 
         @media (min-width: 600px) {
@@ -128,85 +196,117 @@
         }
 
         .factor-input {
-            background-color: #fdfdfd;
-            padding: 15px;
-            border: 1px solid #eee;
-            border-radius: 6px;
+            background-color: var(--card-bg-color);
+            padding: 20px; /* Increased padding */
+            border: 1px solid var(--border-color);
+            border-radius: 10px; /* More rounded */
+            box-shadow: 0 5px 15px rgba(0,0,0,0.06); /* Subtle shadow */
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .factor-input:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
         }
 
         .factor-input label {
             display: block;
-            margin-bottom: 8px;
-            font-weight: bold;
+            margin-bottom: 10px; /* More space */
+            font-weight: 600; /* Semi-bold */
             color: var(--primary-color);
+            font-size: 1.05em;
         }
 
         .factor-input input[type="number"],
-        .factor-input select { /* Added select for styling */
-            width: calc(100% - 20px);
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            margin-bottom: 10px;
+        .factor-input select {
+            width: calc(100% - 22px); /* Adjusted for padding */
+            padding: 12px; /* More padding */
+            border: 1px solid var(--border-color);
+            border-radius: 6px; /* Slightly rounded */
+            margin-bottom: 15px; /* More space */
             box-sizing: border-box;
+            font-size: 1em;
+            color: var(--text-color);
+            background-color: #FDFDFD;
+            transition: all 0.2s ease;
         }
         
         .factor-input input[type="number"]:focus,
-        .factor-input select:focus { /* Added select for styling */
+        .factor-input select:focus {
             border-color: var(--primary-color);
             outline: none;
-            box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.25);
+            background-color: #FFFFFF;
         }
 
         .feedback-area {
-            font-size: 0.9em;
+            font-size: 0.95em;
+            color: var(--secondary-color);
         }
 
         /* Time Gauge */
         .time-gauge-container {
             width: 100%;
-            background-color: #e0e0e0;
-            border-radius: 4px;
-            height: 20px;
-            margin-bottom: 5px;
+            background-color: var(--track-color);
+            border-radius: 6px;
+            height: 22px; /* Slightly taller */
+            margin-bottom: 8px;
             overflow: hidden;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
         }
         .time-gauge-bar {
             height: 100%;
             width: 0%;
-            background-color: var(--danger-color);
+            /* More defined gradient for time gauge */
+            background: linear-gradient(to right, #F44336, #FFC107, #4CAF50); /* Red to Yellow to Green */
             text-align: center;
-            line-height: 20px;
+            line-height: 22px;
             color: white;
-            font-size: 0.8em;
-            transition: width 0.3s ease, background-color 0.3s ease;
+            font-size: 0.85em;
+            font-weight: 600;
+            transition: width 0.4s ease, background-position 0.4s ease; /* Transition for gradient position */
+            background-size: 200% 100%; /* For gradient transition */
+            background-position: 100% 0; /* Start at the end of the gradient */
         }
+        /* Adjust gradient position based on percentage */
+        .time-gauge-bar[style*="width: 0%"] { background-position: 0% 0; }
+        .time-gauge-bar[style*="width: 1%"] { background-position: 0% 0; } /* Starting point */
+        /* Note: For simplicity, the JS directly sets background-color to success-color for 100% */
+        .time-gauge-bar[style*="background-color: var(--success-color)"] {
+             background: var(--success-color); /* Override gradient for full success color */
+        }
+
+
         #time-feedback-text {
             margin-top: 5px;
+            color: var(--text-color);
         }
 
         /* Progress Bar */
         .progress-bar-container {
             width: 100%;
-            background-color: #e0e0e0;
-            border-radius: 4px;
-            height: 20px;
-            margin-bottom: 5px;
+            background-color: var(--track-color);
+            border-radius: 6px;
+            height: 22px;
+            margin-bottom: 8px;
             overflow: hidden;
-            position: relative; /* For tooltip positioning */
+            position: relative;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
         }
         .progress-bar-fill {
             height: 100%;
             width: 0%;
-            background-color: var(--primary-color);
+            /* Gradient for progress bar */
+            background: linear-gradient(to right, var(--primary-color), var(--primary-light));
             text-align: center;
-            line-height: 20px;
+            line-height: 22px;
             color: white;
-            font-size: 0.8em;
-            transition: width 0.3s ease;
+            font-size: 0.85em;
+            font-weight: 600;
+            transition: width 0.4s ease;
         }
         #progress-feedback-text {
              margin-top: 5px;
+             color: var(--text-color);
         }
         .tooltip {
             visibility: hidden;
@@ -218,12 +318,24 @@
             padding: 5px 10px;
             position: absolute;
             z-index: 10;
-            bottom: 125%; /* Position above the element */
+            bottom: 125%;
             left: 50%;
             transform: translateX(-50%);
             opacity: 0;
             transition: opacity 0.3s;
             font-size: 0.8em;
+            white-space: nowrap; /* Prevent tooltip text from wrapping */
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        .tooltip::after { /* Tooltip arrow */
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: var(--dark-color) transparent transparent transparent;
         }
         .progress-bar-container:hover .tooltip {
             visibility: visible;
@@ -234,149 +346,181 @@
         /* Practice Counter */
         #practice-feedback-text {
             margin-top: 5px;
+            color: var(--text-color);
         }
         #practice-message {
-            font-weight: bold;
+            font-weight: 600;
+            margin-top: 8px; /* Added margin */
+            font-size: 1em;
         }
 
         /* Proficiency Status */
         #proficiency-status {
-            padding: 8px;
-            border-radius: 4px;
+            padding: 10px; /* More padding */
+            border-radius: 6px; /* More rounded */
             text-align: center;
-            font-weight: bold;
+            font-weight: 700; /* Bolder */
             color: white;
-            margin-top: 5px;
+            margin-top: 8px; /* More space */
+            transition: background-color 0.3s ease;
         }
         .proficiency-low { background-color: var(--danger-color); }
-        .proficiency-moderate { background-color: var(--warning-color); color: var(--dark-color); }
+        .proficiency-moderate { background-color: var(--warning-color); color: var(--text-color); }
         .proficiency-good { background-color: var(--success-color); }
         #proficiency-score-text {
             margin-top: 5px;
+            color: var(--text-color);
         }
+
+        /* Subject Progress Section */
+        .subject-progress-section {
+            margin-top: 40px;
+            padding-top: 25px;
+            border-top: 1px solid var(--border-color);
+        }
+        .subject-progress-section h2 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 25px;
+            font-size: 1.8em;
+            font-weight: 700;
+        }
+        .subject-list {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px; /* Increased gap */
+        }
+        @media (min-width: 600px) {
+            .subject-list {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        .subject-item {
+            background-color: var(--card-bg-color);
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.06);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .subject-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+        .subject-item h3 {
+            margin-top: 0;
+            margin-bottom: 12px; /* More space */
+            color: var(--primary-color);
+            font-size: 1.2em; /* Slightly larger */
+            font-weight: 600;
+        }
+        .subject-checkboxes label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px; /* More space */
+            font-size: 1em; /* Slightly larger text */
+            color: var(--text-color);
+            cursor: pointer; /* Indicate clickable */
+            transition: color 0.2s ease;
+        }
+        .subject-checkboxes label:hover {
+            color: var(--primary-color);
+        }
+        .subject-checkboxes input[type="checkbox"] {
+            margin-right: 10px; /* More space */
+            transform: scale(1.2); /* Even larger checkboxes */
+            accent-color: var(--primary-color); /* Color for checked state */
+        }
+        .subject-status {
+            font-size: 0.9em;
+            text-align: right;
+            margin-top: 10px; /* More space */
+            font-weight: 600;
+        }
+        .subject-status.completed {
+            color: var(--success-color);
+        }
+        .subject-status.incomplete {
+            color: var(--danger-color);
+        }
+        #subject-completion-feedback {
+            text-align: center;
+            margin-top: 25px; /* More space */
+            font-weight: 700;
+            font-size: 1.1em;
+        }
+        .checkpoint-subjects {
+            background-color: #adb5bd; /* Default grey */
+        }
+
 
         /* Overall Assessment */
         .overall-assessment {
-            margin-top: 30px;
-            padding: 20px;
-            border-radius: 8px;
+            margin-top: 40px;
+            padding: 25px;
+            border-radius: 12px;
             text-align: center;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            transition: all 0.3s ease;
         }
         .overall-assessment.ready {
-            background-color: #e6ffed;
+            background-color: #E8F5E9; /* Lighter success shade */
             border: 1px solid var(--success-color);
         }
         .overall-assessment.not-ready {
-            background-color: #ffebee;
+            background-color: #FFEBEE; /* Lighter danger shade */
             border: 1px solid var(--danger-color);
         }
         #assessment-status {
-            font-size: 1.5em;
-            margin-bottom: 10px;
+            font-size: 1.8em; /* Larger status */
+            margin-bottom: 15px;
+            font-weight: 700;
+            color: var(--text-color); /* Default color */
         }
         .ready #assessment-status { color: var(--success-color); }
         .not-ready #assessment-status { color: var(--danger-color); }
         
+        #assessment-details {
+            color: var(--secondary-color);
+            font-size: 1.0em;
+        }
         #assessment-details ul {
             list-style-type: none;
             padding-left: 0;
             text-align: left;
             display: inline-block; /* Center the list block */
+            margin-top: 15px;
         }
          #assessment-details ul li {
-            margin-bottom: 5px;
+            margin-bottom: 8px; /* More spacing */
+            line-height: 1.4;
+         }
+         #assessment-details strong {
+            color: var(--text-color); /* Make strong text stand out more */
          }
 
         /* Reset Button */
         .reset-button-container {
             text-align: center;
-            margin-top: 30px;
+            margin-top: 40px; /* More space */
         }
         #reset-button {
-            padding: 12px 25px;
-            font-size: 1em;
+            padding: 15px 35px; /* Larger button */
+            font-size: 1.1em; /* Larger text */
             color: white;
-            background-color: var(--secondary-color);
+            /* Gradient for reset button */
+            background: linear-gradient(to right, var(--secondary-color), #888888); /* Grey gradient */
             border: none;
-            border-radius: 4px;
+            border-radius: 8px; /* More rounded */
             cursor: pointer;
-            transition: background-color 0.2s ease;
+            transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
+            font-weight: 600;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
         #reset-button:hover {
-            background-color: var(--dark-color);
-        }
-
-        /* Mock Exam Chart Specific Styles */
-        .mock-exam-section {
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #eee;
-        }
-        .mock-exam-section h2 {
-            text-align: center;
-            color: var(--primary-color);
-            margin-bottom: 15px;
-        }
-        .mock-exam-input {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            align-items: flex-end;
-        }
-        .mock-exam-input label {
-            flex-grow: 1;
-            font-weight: bold;
-            color: var(--primary-color);
-        }
-        .mock-exam-input input[type="number"] {
-            flex-grow: 2;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-        .mock-exam-input button {
-            padding: 10px 15px;
-            background-color: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-        }
-        .mock-exam-input button:hover {
-            background-color: #0056b3;
-        }
-
-        /* Mock Exam Table Styles */
-        #mockExamTableContainer {
-            margin-top: 20px;
-            max-height: 200px; /* Limit height for scroll if many mocks */
-            overflow-y: auto; /* Enable vertical scroll */
-            border: 1px solid #eee;
-            border-radius: 4px;
-        }
-        #mockExamTable {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        #mockExamTable th, #mockExamTable td {
-            padding: 10px;
-            border: 1px solid #ddd;
-            text-align: center;
-        }
-        #mockExamTable th {
-            background-color: var(--primary-color);
-            color: white;
-            position: sticky; /* Make header sticky */
-            top: 0; /* Stick to the top of the container */
-            z-index: 10;
-        }
-        #mockExamTable tbody tr:nth-child(even) {
-            background-color: #f2f2f2;
-        }
-        #mockExamTable tbody tr:hover {
-            background-color: #e9e9e9;
+            background: linear-gradient(to right, var(--dark-color), #555555); /* Darker grey gradient on hover */
+            transform: translateY(-2px); /* Slight lift */
+            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
         }
 
     </style>
@@ -386,9 +530,9 @@
     <div class="container">
         <h1>CFA Certification Readiness Journey</h1>
 
-        <div class="controls" style="text-align: center; margin-bottom: 20px;">
-            <label for="cfaLevel" style="font-weight: bold; color: var(--primary-color); margin-right: 10px;">Select CFA Level:</label>
-            <select id="cfaLevel" style="padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
+        <div class="controls">
+            <label for="cfaLevel">Select CFA Level:</label>
+            <select id="cfaLevel">
                 <option value="I">Level I</option>
                 <option value="II">Level II</option>
                 <option value="III">Level III</option>
@@ -396,7 +540,7 @@
         </div>
 
         <div class="metaphor-area">
-            <p style="text-align:center; margin-bottom:15px;">Your journey to certification success has four key checkpoints. Meet the targets for each to reach the finish line!</p>
+            <p style="text-align:center;">Your journey to certification success has five key checkpoints. Meet the targets for each to reach the finish line!</p>
             <div class="track-container">
                 <div class="track-line"></div>
                 <div class="track-point start">
@@ -418,6 +562,10 @@
                 <div id="checkpoint-proficiency" class="track-point checkpoint">
                     <div class="icon">S%</div>
                     <div class="label">Proficiency</div>
+                </div>
+                 <div id="checkpoint-subjects" class="track-point checkpoint">
+                    <div class="icon">Sub</div>
+                    <div class="label">Subjects</div>
                 </div>
                 <div class="track-point finish">
                     <div class="icon">F</div>
@@ -469,33 +617,18 @@
             </div>
         </div>
 
+        <!-- Subject Progress Section -->
+        <div class="subject-progress-section">
+            <h2>Subject-Wise Study Progress</h2>
+            <div id="subject-list-container" class="subject-list">
+                <!-- Subjects will be dynamically loaded here -->
+            </div>
+            <div id="subject-completion-feedback"></div>
+        </div>
+
         <div id="overall-assessment" class="overall-assessment">
             <h2 id="assessment-status">Enter your data above</h2>
             <div id="assessment-details"></div>
-        </div>
-
-        <div class="mock-exam-section">
-            <h2>Mock Exam Progress</h2>
-            <div class="mock-exam-input">
-                <label for="mockScore">Enter Mock Exam Score (0-100):</label>
-                <input type="number" id="mockScore" min="0" max="100" placeholder="e.g., 72">
-                <button id="addMockScore">Add Score</button>
-            </div>
-            <canvas id="mockExamChart"></canvas>
-            
-            <div id="mockExamTableContainer">
-                <table id="mockExamTable">
-                    <thead>
-                        <tr>
-                            <th>Mock #</th>
-                            <th>Score (%)</th>
-                            <th>Date Added</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        </tbody>
-                </table>
-            </div>
         </div>
 
         <div class="reset-button-container">
@@ -504,7 +637,6 @@
 
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         // --- Configuration (Dynamic based on CFA Level) ---
         const CFA_LEVEL_DATA = {
@@ -514,7 +646,8 @@
                 TARGET_PROFICIENCY_SCORE: 70, // Minimum for "Good"
                 PROFICIENCY_MODERATE_THRESHOLD: 60,
                 TARGET_PROGRESS_PERCENT: 100, // Ideal
-                READY_PROGRESS_THRESHOLD: 90 // Minimum for "Ready" status
+                READY_PROGRESS_THRESHOLD: 90, // Minimum for "Ready" status
+                TARGET_SUBJECT_COMPLETION_PERCENT: 90 // Target percentage of subjects with both F/Q completed
             },
             "II": {
                 RECOMMENDED_TIME_HOURS: 320,
@@ -522,7 +655,8 @@
                 TARGET_PROFICIENCY_SCORE: 70,
                 PROFICIENCY_MODERATE_THRESHOLD: 60,
                 TARGET_PROGRESS_PERCENT: 100,
-                READY_PROGRESS_THRESHOLD: 90
+                READY_PROGRESS_THRESHOLD: 90,
+                TARGET_SUBJECT_COMPLETION_PERCENT: 90
             },
             "III": {
                 RECOMMENDED_TIME_HOURS: 350,
@@ -530,8 +664,48 @@
                 TARGET_PROFICIENCY_SCORE: 75, // Often higher for Level III
                 PROFICIENCY_MODERATE_THRESHOLD: 65,
                 TARGET_PROGRESS_PERCENT: 100,
-                READY_PROGRESS_THRESHOLD: 90
+                READY_PROGRESS_THRESHOLD: 90,
+                TARGET_SUBJECT_COMPLETION_PERCENT: 95 // Higher for Level III
             }
+        };
+
+        const CFA_LEVEL_SUBJECTS_MASTER = {
+            "I": [
+                { name: "Ethical and Professional Standards", flashcards: false, quizzes: false },
+                { name: "Quantitative Methods", flashcards: false, quizzes: false },
+                { name: "Economics", flashcards: false, quizzes: false },
+                { name: "Financial Statement Analysis", flashcards: false, quizzes: false },
+                { name: "Corporate Issuers", flashcards: false, quizzes: false },
+                { name: "Equity Investments", flashcards: false, quizzes: false },
+                { name: "Fixed Income", flashcards: false, quizzes: false },
+                { name: "Derivatives", flashcards: false, quizzes: false },
+                { name: "Alternative Investments", flashcards: false, quizzes: false },
+                { name: "Portfolio Management and Wealth Management", flashcards: false, quizzes: false },
+            ],
+            "II": [
+                { name: "Ethical and Professional Standards", flashcards: false, quizzes: false },
+                { name: "Quantitative Methods for Valuations", flashcards: false, quizzes: false },
+                { name: "Economics for Valuation", flashcards: false, quizzes: false },
+                { name: "Financial Statement Analysis for Valuation", flashcards: false, quizzes: false },
+                { name: "Corporate Issuers for Valuation", flashcards: false, quizzes: false },
+                { name: "Equity Valuation", flashcards: false, quizzes: false },
+                { name: "Fixed Income Valuation", flashcards: false, quizzes: false },
+                { name: "Derivatives and Risk Management", flashcards: false, quizzes: false },
+                { name: "Alternative Investments", flashcards: false, quizzes: false },
+                { name: "Portfolio Management", flashcards: false, quizzes: false },
+            ],
+            "III": [
+                { name: "Ethical and Professional Standards", flashcards: false, quizzes: false },
+                { name: "Behavioral Finance", flashcards: false, quizzes: false },
+                { name: "Private Wealth Management", flashcards: false, quizzes: false },
+                { name: "Institutional Investors", flashcards: false, quizzes: false },
+                { name: "Risk Management", flashcards: false, quizzes: false },
+                { name: "Asset Allocation", flashcards: false, quizzes: false },
+                { name: "Fixed Income and Derivatives Strategies", flashcards: false, quizzes: false },
+                { name: "Equity Strategies", flashcards: false, quizzes: false },
+                { name: "Alternative Investments Strategies", flashcards: false, quizzes: false },
+                { name: "Portfolio Management and Performance Evaluation", flashcards: false, quizzes: false },
+            ]
         };
 
         // --- DOM Elements ---
@@ -557,24 +731,20 @@
         const proficiencyScoreText = document.getElementById('proficiency-score-text');
         const checkpointProficiency = document.getElementById('checkpoint-proficiency');
 
+        const subjectListContainer = document.getElementById('subject-list-container');
+        const subjectCompletionFeedback = document.getElementById('subject-completion-feedback');
+        const checkpointSubjects = document.getElementById('checkpoint-subjects');
+
+
         const overallAssessmentDiv = document.getElementById('overall-assessment');
         const assessmentStatus = document.getElementById('assessment-status');
         const assessmentDetails = document.getElementById('assessment-details');
         const resetButton = document.getElementById('reset-button');
 
-        // Mock Exam Chart & Table Elements
-        const mockScoreInput = document.getElementById('mockScore');
-        const addMockScoreButton = document.getElementById('addMockScore');
-        const mockExamChartCanvas = document.getElementById('mockExamChart');
-        const mockExamTableBody = document.querySelector('#mockExamTable tbody');
-
 
         // --- Global Variables ---
         let currentCfaLevelData = CFA_LEVEL_DATA[cfaLevelSelect.value]; // Initialize with default Level I data
-        let mockExamScores = []; // Stores objects: { score: number, date: string }
-
-        // Chart.js instance
-        let mockChart;
+        let subjectProgress = {}; // Stores completion status for subjects of the *current* level
 
         // --- Event Listeners ---
         cfaLevelSelect.addEventListener('change', updateCfaLevelAndVisuals);
@@ -582,7 +752,6 @@
         progressInput.addEventListener('input', updateAllVisuals);
         practiceInput.addEventListener('input', updateAllVisuals);
         proficiencyInput.addEventListener('input', updateAllVisuals);
-        addMockScoreButton.addEventListener('click', addMockScore);
         resetButton.addEventListener('click', resetApp);
 
         // --- Update Functions ---
@@ -590,9 +759,16 @@
         function updateCfaLevelAndVisuals() {
             const selectedLevel = cfaLevelSelect.value;
             currentCfaLevelData = CFA_LEVEL_DATA[selectedLevel];
+            
+            // Initialize subject progress for the selected level if not already present
+            if (!subjectProgress[selectedLevel]) {
+                // Deep copy the master subject data to avoid modifying the original config
+                subjectProgress[selectedLevel] = JSON.parse(JSON.stringify(CFA_LEVEL_SUBJECTS_MASTER[selectedLevel]));
+            }
+
             // After updating currentCfaLevelData, re-run all visuals to reflect new targets
             updateAllVisuals();
-            // No need to re-render mock chart here, as level doesn't change scores/labels
+            renderSubjects(); // Render subjects specific to the new level
             console.log(`CFA Level set to: ${selectedLevel}, Recommended Hours: ${currentCfaLevelData.RECOMMENDED_TIME_HOURS}`);
         }
 
@@ -602,17 +778,23 @@
             
             timeGaugeBar.style.width = `${percentage}%`;
             
-            if (hours >= currentCfaLevelData.RECOMMENDED_TIME_HOURS) {
-                timeGaugeBar.style.backgroundColor = 'var(--success-color)';
-                timeGaugeBar.textContent = 'Target Met!';
-                checkpointTime.classList.add('met');
-            } else if (hours >= currentCfaLevelData.RECOMMENDED_TIME_HOURS * 0.66) {
-                timeGaugeBar.style.backgroundColor = 'var(--warning-color)';
-                timeGaugeBar.textContent = '';
-                checkpointTime.classList.remove('met');
+            // Adjust gradient position based on progress
+            if (hours < currentCfaLevelData.RECOMMENDED_TIME_HOURS) {
+                const gradientPos = (percentage / 100) * 100; // Map 0-100% to 0-100% for gradient position
+                timeGaugeBar.style.backgroundPosition = `${100 - gradientPos}% 0`; // Inverse for right-to-left fill
+                timeGaugeBar.textContent = ''; // Clear text content when not at target
+                timeGaugeBar.style.background = `linear-gradient(to right, #F44336, #FFC107, #4CAF50)`; /* Red to Yellow to Green */
+                timeGaugeBar.style.backgroundSize = `200% 100%`;
             } else {
-                timeGaugeBar.style.backgroundColor = 'var(--danger-color)';
-                timeGaugeBar.textContent = '';
+                timeGaugeBar.style.background = 'var(--success-color)'; // Use solid color when target met
+                timeGaugeBar.textContent = 'Target Met!';
+                timeGaugeBar.style.backgroundPosition = '0% 0'; // Reset gradient position for solid color
+            }
+
+
+            if (hours >= currentCfaLevelData.RECOMMENDED_TIME_HOURS) {
+                checkpointTime.classList.add('met');
+            } else {
                 checkpointTime.classList.remove('met');
             }
             
@@ -678,16 +860,153 @@
             }
         }
 
+        function renderSubjects() {
+            subjectListContainer.innerHTML = ''; // Clear existing subjects
+
+            const currentLevel = cfaLevelSelect.value;
+            const subjectsForLevel = subjectProgress[currentLevel]; // Get the active subject progress for the current level
+
+            if (!subjectsForLevel || subjectsForLevel.length === 0) {
+                subjectListContainer.innerHTML = '<p style="text-align: center; font-style: italic;">No subjects defined for this CFA Level.</p>';
+                return;
+            }
+
+            subjectsForLevel.forEach((subject, index) => {
+                const subjectItem = document.createElement('div');
+                subjectItem.classList.add('subject-item');
+
+                const subjectName = document.createElement('h3');
+                subjectName.textContent = subject.name;
+                subjectItem.appendChild(subjectName);
+
+                const checkboxesDiv = document.createElement('div');
+                checkboxesDiv.classList.add('subject-checkboxes');
+
+                // Flashcards Checkbox
+                const flashcardsLabel = document.createElement('label');
+                const flashcardsCheckbox = document.createElement('input');
+                flashcardsCheckbox.type = 'checkbox';
+                flashcardsCheckbox.checked = subject.flashcards;
+                flashcardsCheckbox.dataset.subjectIndex = index; // Store index to identify subject
+                flashcardsCheckbox.dataset.type = 'flashcards';
+                flashcardsCheckbox.addEventListener('change', handleSubjectCheckboxChange);
+                flashcardsLabel.appendChild(flashcardsCheckbox);
+                flashcardsLabel.innerHTML += ' Flashcards Completed';
+                checkboxesDiv.appendChild(flashcardsLabel);
+
+                // Quizzes Checkbox
+                const quizzesLabel = document.createElement('label');
+                const quizzesCheckbox = document.createElement('input');
+                quizzesCheckbox.type = 'checkbox';
+                quizzesCheckbox.checked = subject.quizzes;
+                quizzesCheckbox.dataset.subjectIndex = index;
+                quizzesCheckbox.dataset.type = 'quizzes';
+                quizzesCheckbox.addEventListener('change', handleSubjectCheckboxChange);
+                quizzesLabel.appendChild(quizzesCheckbox);
+                quizzesLabel.innerHTML += ' Quizzes Completed';
+                checkboxesDiv.appendChild(quizzesLabel);
+
+                subjectItem.appendChild(checkboxesDiv);
+
+                const statusSpan = document.createElement('div');
+                statusSpan.classList.add('subject-status');
+                updateSubjectItemStatus(statusSpan, subject.flashcards, subject.quizzes);
+                subjectItem.appendChild(statusSpan);
+
+                subjectListContainer.appendChild(subjectItem);
+            });
+            updateSubjectCompletionVisuals(); // Update overall subject completion feedback
+        }
+
+        function handleSubjectCheckboxChange(event) {
+            const index = parseInt(event.target.dataset.subjectIndex);
+            const type = event.target.dataset.type;
+            const isChecked = event.target.checked;
+
+            const currentLevel = cfaLevelSelect.value;
+            subjectProgress[currentLevel][index][type] = isChecked;
+
+            // Update status within the subject item (optional, but good UX)
+            const subjectItem = event.target.closest('.subject-item');
+            const statusSpan = subjectItem.querySelector('.subject-status');
+            updateSubjectItemStatus(statusSpan, 
+                                   subjectProgress[currentLevel][index].flashcards, 
+                                   subjectProgress[currentLevel][index].quizzes);
+
+            updateSubjectCompletionVisuals(); // Re-calculate and update overall subject completion
+            updateOverallAssessment(); // Re-evaluate overall readiness
+        }
+
+        function updateSubjectItemStatus(statusSpan, flashcardsDone, quizzesDone) {
+            statusSpan.classList.remove('completed', 'incomplete');
+            if (flashcardsDone && quizzesDone) {
+                statusSpan.textContent = 'All Done!';
+                statusSpan.classList.add('completed');
+            } else if (flashcardsDone || quizzesDone) {
+                statusSpan.textContent = 'Partially Done';
+                statusSpan.classList.add('incomplete'); // Using 'incomplete' for partial too, or add 'partial'
+            } else {
+                statusSpan.textContent = 'Not Started';
+                statusSpan.classList.add('incomplete');
+            }
+        }
+
+        function updateSubjectCompletionVisuals() {
+            const currentLevel = cfaLevelSelect.value;
+            const subjectsForLevel = subjectProgress[currentLevel] || [];
+            
+            let fullyCompletedSubjects = 0;
+            if (subjectsForLevel.length > 0) {
+                subjectsForLevel.forEach(subject => {
+                    if (subject.flashcards && subject.quizzes) {
+                        fullyCompletedSubjects++;
+                    }
+                });
+            }
+
+            const totalSubjects = subjectsForLevel.length;
+            const completionPercentage = totalSubjects > 0 ? (fullyCompletedSubjects / totalSubjects) * 100 : 0;
+            
+            let feedbackText = `${fullyCompletedSubjects} out of ${totalSubjects} subjects fully completed. (${completionPercentage.toFixed(0)}%)`;
+            subjectCompletionFeedback.textContent = feedbackText;
+
+            if (completionPercentage >= currentCfaLevelData.TARGET_SUBJECT_COMPLETION_PERCENT) {
+                subjectCompletionFeedback.style.color = 'var(--success-color)';
+                checkpointSubjects.classList.add('met');
+            } else if (completionPercentage >= currentCfaLevelData.TARGET_SUBJECT_COMPLETION_PERCENT * 0.5) {
+                subjectCompletionFeedback.style.color = 'var(--warning-color)';
+                checkpointSubjects.classList.remove('met');
+            } else {
+                subjectCompletionFeedback.style.color = 'var(--danger-color)';
+                checkpointSubjects.classList.remove('met');
+            }
+        }
+
         function updateOverallAssessment() {
             const time = parseInt(timeInput.value) || 0;
             const progress = parseInt(progressInput.value) || 0;
             const practice = parseInt(practiceInput.value) || 0;
             const proficiency = parseInt(proficiencyInput.value) || 0;
+            
+            const currentLevel = cfaLevelSelect.value;
+            const subjectsForLevel = subjectProgress[currentLevel] || [];
+            let fullyCompletedSubjects = 0;
+            if (subjectsForLevel.length > 0) {
+                subjectsForLevel.forEach(subject => {
+                    if (subject.flashcards && subject.quizzes) {
+                        fullyCompletedSubjects++;
+                    }
+                });
+            }
+            const totalSubjects = subjectsForLevel.length;
+            const subjectCompletionPercentage = totalSubjects > 0 ? (fullyCompletedSubjects / totalSubjects) * 100 : 0;
+
 
             const isTimeMet = time >= currentCfaLevelData.RECOMMENDED_TIME_HOURS;
             const isProgressMet = progress >= currentCfaLevelData.READY_PROGRESS_THRESHOLD;
             const isPracticeMet = practice >= currentCfaLevelData.RECOMMENDED_PRACTICE_QUESTIONS;
             const isProficiencyMet = proficiency >= currentCfaLevelData.TARGET_PROFICIENCY_SCORE;
+            const isSubjectsMet = subjectCompletionPercentage >= currentCfaLevelData.TARGET_SUBJECT_COMPLETION_PERCENT;
 
             let messages = [];
             let allMet = true;
@@ -697,22 +1016,28 @@
                 allMet = false;
             }
             if (!isProgressMet) {
-                messages.push(`<strong>Progress:</strong> Complete at least ${Math.max(0, currentCfaLevelData.READY_PROGRESS_THRESHOLD - progress)}% more of the curriculum (Aim for 100%, minimum ${currentCfaLevelData.READY_PROGRESS_THRESHOLD}% for readiness).`);
+                messages.push(`<strong>Curriculum Progress:</strong> Complete at least ${Math.max(0, currentCfaLevelData.READY_PROGRESS_THRESHOLD - progress)}% more of the curriculum (Aim for 100%, minimum ${currentCfaLevelData.READY_PROGRESS_THRESHOLD}% for readiness).`);
                 allMet = false;
             }
             if (!isPracticeMet) {
-                messages.push(`<strong>Practice:</strong> Attempt at least ${currentCfaLevelData.RECOMMENDED_PRACTICE_QUESTIONS - practice} more questions (Recommended: ${currentCfaLevelData.RECOMMENDED_PRACTICE_QUESTIONS}).`);
+                messages.push(`<strong>Practice Questions:</strong> Attempt at least ${currentCfaLevelData.RECOMMENDED_PRACTICE_QUESTIONS - practice} more questions (Recommended: ${currentCfaLevelData.RECOMMENDED_PRACTICE_QUESTIONS}).`);
                 allMet = false;
             }
             if (!isProficiencyMet) {
                 messages.push(`<strong>Proficiency:</strong> Improve average score to ${currentCfaLevelData.TARGET_PROFICIENCY_SCORE}% or higher (Current: ${proficiency}%).`);
                 allMet = false;
             }
+             if (!isSubjectsMet) {
+                messages.push(`<strong>Subject Coverage:</strong> Fully complete flashcards and quizzes for at least ${Math.ceil(currentCfaLevelData.TARGET_SUBJECT_COMPLETION_PERCENT / 100 * totalSubjects)} out of ${totalSubjects} subjects (Current: ${fullyCompletedSubjects}).`);
+                allMet = false;
+            }
+
 
             overallAssessmentDiv.classList.remove('ready', 'not-ready');
 
-            // Check if any input has a value, not just all of them
-            const anyInputFilled = timeInput.value || progressInput.value || practiceInput.value || proficiencyInput.value;
+            // Check if any input has a value, including any subject checkbox
+            const anyInputFilled = timeInput.value || progressInput.value || practiceInput.value || proficiencyInput.value || 
+                                   Object.values(subjectProgress[currentLevel] || {}).some(subj => subj.flashcards || subj.quizzes);
 
             if (allMet && anyInputFilled) {
                 assessmentStatus.textContent = 'Ready for the Exam!';
@@ -734,160 +1059,33 @@
             }
         }
 
-        function renderMockExamChart() {
-            const ctx = mockExamChartCanvas.getContext('2d');
-
-            // Destroy previous chart instance if it exists
-            if (mockChart) {
-                mockChart.destroy();
-            }
-
-            mockChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: mockExamScores.map((_, index) => `Mock ${index + 1}`), // Labels for each score
-                    datasets: [{
-                        label: 'Mock Exam Score (%)',
-                        data: mockExamScores.map(m => m.score), // Use score property
-                        borderColor: 'rgb(75, 192, 192)',
-                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                        tension: 0.1,
-                        fill: false,
-                        pointBackgroundColor: 'rgb(75, 192, 192)',
-                        pointBorderColor: '#fff',
-                        pointHoverBackgroundColor: '#fff',
-                        pointHoverBorderColor: 'rgb(75, 192, 192)'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false, // Allow canvas to resize freely
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            max: 100, // Scores are 0-100
-                            title: {
-                                display: true,
-                                text: 'Score (%)'
-                            }
-                        },
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Mock Exam Attempt'
-                            }
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            display: true,
-                            position: 'top',
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return `Score: ${context.raw}%`;
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        function renderMockExamTable() {
-            mockExamTableBody.innerHTML = ''; // Clear existing rows
-
-            if (mockExamScores.length === 0) {
-                const row = mockExamTableBody.insertRow();
-                const cell = row.insertCell();
-                cell.colSpan = 3;
-                cell.textContent = 'No mock exam scores added yet.';
-                cell.style.fontStyle = 'italic';
-                cell.style.padding = '20px';
-                return;
-            }
-
-            mockExamScores.forEach((mock, index) => {
-                const row = mockExamTableBody.insertRow();
-                const cellMockNum = row.insertCell();
-                const cellScore = row.insertCell();
-                const cellDate = row.insertCell();
-
-                cellMockNum.textContent = `Mock ${index + 1}`;
-                cellScore.textContent = `${mock.score}%`;
-                cellDate.textContent = mock.date;
-            });
-        }
-
-        function addMockScore() {
-            const score = parseInt(mockScoreInput.value);
-            if (!isNaN(score) && score >= 0 && score <= 100) {
-                const currentDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
-                mockExamScores.push({ score: score, date: currentDate });
-                
-                // You can choose to limit the number of scores displayed in the chart/table
-                // For simplicity, I'm allowing all for now, but if it gets too long, you can re-implement .shift() here
-                // if (mockExamScores.length > 10) { mockExamScores.shift(); } 
-
-                mockScoreInput.value = ''; // Clear input field
-                renderMockExamChart(); // Update the chart
-                renderMockExamTable(); // Update the table
-            } else {
-                alert('Please enter a valid mock exam score between 0 and 100.');
-            }
-        }
-
         function updateAllVisuals() {
             updateTimeVisuals();
             updateProgressVisuals();
             updatePracticeVisuals();
             updateProficiencyVisuals();
+            updateSubjectCompletionVisuals(); // New visual update for subjects
             updateOverallAssessment();
-            // renderMockExamChart() and renderMockExamTable() are now called only when scores are added or on reset
         }
 
         function resetApp() {
-            // Reset inputs
+            // Reset input fields
             timeInput.value = '';
             progressInput.value = '';
             practiceInput.value = '';
             proficiencyInput.value = '';
-            mockScoreInput.value = '';
+            cfaLevelSelect.value = 'I'; // Reset to Level I
 
-            // Reset mock scores and chart/table
-            mockExamScores = [];
-            if (mockChart) {
-                mockChart.destroy();
-                mockChart = null; // Clear the chart instance
-            }
-            renderMockExamChart(); // Render empty chart
-            renderMockExamTable(); // Render empty table
-
-            // Reset visual indicators for checkpoints
-            [checkpointTime, checkpointProgress, checkpointPractice, checkpointProficiency].forEach(cp => {
-                cp.classList.remove('met');
-            });
-
-            // Re-run all updates to reflect reset state (and current CFA level data)
-            updateAllVisuals();
+            // Clear all stored subject progress
+            subjectProgress = {};
             
-            // Explicitly reset some text/classes that might not clear with just updateAllVisuals on empty inputs
-            timeGaugeBar.textContent = '';
-            progressBarFill.textContent = '0%';
-            proficiencyStatus.textContent = 'Enter score';
-            proficiencyStatus.className = ''; // Clear color classes
-            practiceMessage.textContent = '';
-            assessmentStatus.textContent = 'Enter your data above';
-            assessmentDetails.innerHTML = '<p>Input your study metrics to see your readiness assessment.</p>';
-            overallAssessmentDiv.className = 'overall-assessment'; // Ensure it's reset to default
+            // Re-initialize and update visuals for the default level
+            updateCfaLevelAndVisuals(); 
         }
 
-        // --- Initial Call on Load ---
+        // Initial render on page load
         document.addEventListener('DOMContentLoaded', () => {
-            updateAllVisuals(); // Set initial state based on default values
-            renderMockExamChart(); // Initialize empty chart
-            renderMockExamTable(); // Initialize empty table
+            updateCfaLevelAndVisuals(); // Initialize with Level I data and update all visuals
         });
     </script>
 </body>
