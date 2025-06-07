@@ -347,6 +347,38 @@
         .mock-exam-input button:hover {
             background-color: #0056b3;
         }
+
+        /* Mock Exam Table Styles */
+        #mockExamTableContainer {
+            margin-top: 20px;
+            max-height: 200px; /* Limit height for scroll if many mocks */
+            overflow-y: auto; /* Enable vertical scroll */
+            border: 1px solid #eee;
+            border-radius: 4px;
+        }
+        #mockExamTable {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        #mockExamTable th, #mockExamTable td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+        #mockExamTable th {
+            background-color: var(--primary-color);
+            color: white;
+            position: sticky; /* Make header sticky */
+            top: 0; /* Stick to the top of the container */
+            z-index: 10;
+        }
+        #mockExamTable tbody tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        #mockExamTable tbody tr:hover {
+            background-color: #e9e9e9;
+        }
+
     </style>
 </head>
 <body>
@@ -445,11 +477,25 @@
         <div class="mock-exam-section">
             <h2>Mock Exam Progress</h2>
             <div class="mock-exam-input">
-                <label for="mockScore">Enter Last Mock Exam Score (0-100):</label>
+                <label for="mockScore">Enter Mock Exam Score (0-100):</label>
                 <input type="number" id="mockScore" min="0" max="100" placeholder="e.g., 72">
                 <button id="addMockScore">Add Score</button>
             </div>
             <canvas id="mockExamChart"></canvas>
+            
+            <div id="mockExamTableContainer">
+                <table id="mockExamTable">
+                    <thead>
+                        <tr>
+                            <th>Mock #</th>
+                            <th>Score (%)</th>
+                            <th>Date Added</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        </tbody>
+                </table>
+            </div>
         </div>
 
         <div class="reset-button-container">
@@ -516,14 +562,16 @@
         const assessmentDetails = document.getElementById('assessment-details');
         const resetButton = document.getElementById('reset-button');
 
-        // Mock Exam Chart Elements
+        // Mock Exam Chart & Table Elements
         const mockScoreInput = document.getElementById('mockScore');
         const addMockScoreButton = document.getElementById('addMockScore');
         const mockExamChartCanvas = document.getElementById('mockExamChart');
+        const mockExamTableBody = document.querySelector('#mockExamTable tbody');
+
 
         // --- Global Variables ---
         let currentCfaLevelData = CFA_LEVEL_DATA[cfaLevelSelect.value]; // Initialize with default Level I data
-        let mockExamScores = []; // Stores the last 5 mock scores
+        let mockExamScores = []; // Stores objects: { score: number, date: string }
 
         // Chart.js instance
         let mockChart;
@@ -544,7 +592,7 @@
             currentCfaLevelData = CFA_LEVEL_DATA[selectedLevel];
             // After updating currentCfaLevelData, re-run all visuals to reflect new targets
             updateAllVisuals();
-            renderMockExamChart(); // Re-render chart if needed (though scores don't change by level)
+            // No need to re-render mock chart here, as level doesn't change scores/labels
             console.log(`CFA Level set to: ${selectedLevel}, Recommended Hours: ${currentCfaLevelData.RECOMMENDED_TIME_HOURS}`);
         }
 
@@ -700,7 +748,7 @@
                     labels: mockExamScores.map((_, index) => `Mock ${index + 1}`), // Labels for each score
                     datasets: [{
                         label: 'Mock Exam Score (%)',
-                        data: mockExamScores,
+                        data: mockExamScores.map(m => m.score), // Use score property
                         borderColor: 'rgb(75, 192, 192)',
                         backgroundColor: 'rgba(75, 192, 192, 0.2)',
                         tension: 0.1,
@@ -747,17 +795,44 @@
             });
         }
 
+        function renderMockExamTable() {
+            mockExamTableBody.innerHTML = ''; // Clear existing rows
+
+            if (mockExamScores.length === 0) {
+                const row = mockExamTableBody.insertRow();
+                const cell = row.insertCell();
+                cell.colSpan = 3;
+                cell.textContent = 'No mock exam scores added yet.';
+                cell.style.fontStyle = 'italic';
+                cell.style.padding = '20px';
+                return;
+            }
+
+            mockExamScores.forEach((mock, index) => {
+                const row = mockExamTableBody.insertRow();
+                const cellMockNum = row.insertCell();
+                const cellScore = row.insertCell();
+                const cellDate = row.insertCell();
+
+                cellMockNum.textContent = `Mock ${index + 1}`;
+                cellScore.textContent = `${mock.score}%`;
+                cellDate.textContent = mock.date;
+            });
+        }
+
         function addMockScore() {
             const score = parseInt(mockScoreInput.value);
             if (!isNaN(score) && score >= 0 && score <= 100) {
-                // Add score to the array
-                mockExamScores.push(score);
-                // Keep only the last 5 scores for the chart
-                if (mockExamScores.length > 5) {
-                    mockExamScores.shift(); // Remove the oldest score
-                }
+                const currentDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+                mockExamScores.push({ score: score, date: currentDate });
+                
+                // You can choose to limit the number of scores displayed in the chart/table
+                // For simplicity, I'm allowing all for now, but if it gets too long, you can re-implement .shift() here
+                // if (mockExamScores.length > 10) { mockExamScores.shift(); } 
+
                 mockScoreInput.value = ''; // Clear input field
                 renderMockExamChart(); // Update the chart
+                renderMockExamTable(); // Update the table
             } else {
                 alert('Please enter a valid mock exam score between 0 and 100.');
             }
@@ -769,6 +844,7 @@
             updatePracticeVisuals();
             updateProficiencyVisuals();
             updateOverallAssessment();
+            // renderMockExamChart() and renderMockExamTable() are now called only when scores are added or on reset
         }
 
         function resetApp() {
@@ -779,13 +855,14 @@
             proficiencyInput.value = '';
             mockScoreInput.value = '';
 
-            // Reset mock scores and chart
+            // Reset mock scores and chart/table
             mockExamScores = [];
             if (mockChart) {
                 mockChart.destroy();
                 mockChart = null; // Clear the chart instance
             }
-            renderMockExamChart(); // Re-render an empty chart
+            renderMockExamChart(); // Render empty chart
+            renderMockExamTable(); // Render empty table
 
             // Reset visual indicators for checkpoints
             [checkpointTime, checkpointProgress, checkpointPractice, checkpointProficiency].forEach(cp => {
@@ -803,16 +880,15 @@
             practiceMessage.textContent = '';
             assessmentStatus.textContent = 'Enter your data above';
             assessmentDetails.innerHTML = '<p>Input your study metrics to see your readiness assessment.</p>';
-            overallAssessmentDiv.className = 'overall-assessment';
+            overallAssessmentDiv.className = 'overall-assessment'; // Ensure it's reset to default
         }
 
-        // --- Initial Load ---
+        // --- Initial Call on Load ---
         document.addEventListener('DOMContentLoaded', () => {
-            // Initialize the app with the default CFA level's data
-            updateCfaLevelAndVisuals(); 
-            resetApp(); // Ensure all fields and visuals are reset
+            updateAllVisuals(); // Set initial state based on default values
+            renderMockExamChart(); // Initialize empty chart
+            renderMockExamTable(); // Initialize empty table
         });
-
     </script>
 </body>
 </html>
