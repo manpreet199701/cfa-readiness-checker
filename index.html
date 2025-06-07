@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
-<head> 
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Certification Readiness Checker</title>
+    <title>CFA Certification Readiness Checker</title>
     <style>
         :root {
             --primary-color: #007bff;
@@ -141,7 +141,8 @@
             color: var(--primary-color);
         }
 
-        .factor-input input[type="number"] {
+        .factor-input input[type="number"],
+        .factor-input select { /* Added select for styling */
             width: calc(100% - 20px);
             padding: 10px;
             border: 1px solid #ccc;
@@ -150,7 +151,8 @@
             box-sizing: border-box;
         }
         
-        .factor-input input[type="number"]:focus {
+        .factor-input input[type="number"]:focus,
+        .factor-input select:focus { /* Added select for styling */
             border-color: var(--primary-color);
             outline: none;
             box-shadow: 0 0 0 0.2rem rgba(0,123,255,.25);
@@ -304,12 +306,62 @@
             background-color: var(--dark-color);
         }
 
+        /* Mock Exam Chart Specific Styles */
+        .mock-exam-section {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        .mock-exam-section h2 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+        .mock-exam-input {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            align-items: flex-end;
+        }
+        .mock-exam-input label {
+            flex-grow: 1;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+        .mock-exam-input input[type="number"] {
+            flex-grow: 2;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .mock-exam-input button {
+            padding: 10px 15px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+        }
+        .mock-exam-input button:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>Certification Readiness Journey</h1>
+        <h1>CFA Certification Readiness Journey</h1>
+
+        <div class="controls" style="text-align: center; margin-bottom: 20px;">
+            <label for="cfaLevel" style="font-weight: bold; color: var(--primary-color); margin-right: 10px;">Select CFA Level:</label>
+            <select id="cfaLevel" style="padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
+                <option value="I">Level I</option>
+                <option value="II">Level II</option>
+                <option value="III">Level III</option>
+            </select>
+        </div>
 
         <div class="metaphor-area">
             <p style="text-align:center; margin-bottom:15px;">Your journey to certification success has four key checkpoints. Meet the targets for each to reach the finish line!</p>
@@ -390,22 +442,55 @@
             <div id="assessment-details"></div>
         </div>
 
+        <div class="mock-exam-section">
+            <h2>Mock Exam Progress</h2>
+            <div class="mock-exam-input">
+                <label for="mockScore">Enter Last Mock Exam Score (0-100):</label>
+                <input type="number" id="mockScore" min="0" max="100" placeholder="e.g., 72">
+                <button id="addMockScore">Add Score</button>
+            </div>
+            <canvas id="mockExamChart"></canvas>
+        </div>
+
         <div class="reset-button-container">
             <button id="reset-button">Reset All</button>
         </div>
 
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        // --- Configuration ---
-        const RECOMMENDED_TIME_HOURS = 300;
-        const RECOMMENDED_PRACTICE_QUESTIONS = 2000;
-        const TARGET_PROFICIENCY_SCORE = 70; // Minimum for "Good"
-        const PROFICIENCY_MODERATE_THRESHOLD = 60;
-        const TARGET_PROGRESS_PERCENT = 100; // Ideal
-        const READY_PROGRESS_THRESHOLD = 90; // Minimum for "Ready" status
+        // --- Configuration (Dynamic based on CFA Level) ---
+        const CFA_LEVEL_DATA = {
+            "I": {
+                RECOMMENDED_TIME_HOURS: 300,
+                RECOMMENDED_PRACTICE_QUESTIONS: 2000,
+                TARGET_PROFICIENCY_SCORE: 70, // Minimum for "Good"
+                PROFICIENCY_MODERATE_THRESHOLD: 60,
+                TARGET_PROGRESS_PERCENT: 100, // Ideal
+                READY_PROGRESS_THRESHOLD: 90 // Minimum for "Ready" status
+            },
+            "II": {
+                RECOMMENDED_TIME_HOURS: 320,
+                RECOMMENDED_PRACTICE_QUESTIONS: 2500,
+                TARGET_PROFICIENCY_SCORE: 70,
+                PROFICIENCY_MODERATE_THRESHOLD: 60,
+                TARGET_PROGRESS_PERCENT: 100,
+                READY_PROGRESS_THRESHOLD: 90
+            },
+            "III": {
+                RECOMMENDED_TIME_HOURS: 350,
+                RECOMMENDED_PRACTICE_QUESTIONS: 3000,
+                TARGET_PROFICIENCY_SCORE: 75, // Often higher for Level III
+                PROFICIENCY_MODERATE_THRESHOLD: 65,
+                TARGET_PROGRESS_PERCENT: 100,
+                READY_PROGRESS_THRESHOLD: 90
+            }
+        };
 
         // --- DOM Elements ---
+        const cfaLevelSelect = document.getElementById('cfaLevel');
+
         const timeInput = document.getElementById('time-input');
         const timeGaugeBar = document.getElementById('time-gauge-bar');
         const timeFeedbackText = document.getElementById('time-feedback-text');
@@ -431,25 +516,49 @@
         const assessmentDetails = document.getElementById('assessment-details');
         const resetButton = document.getElementById('reset-button');
 
+        // Mock Exam Chart Elements
+        const mockScoreInput = document.getElementById('mockScore');
+        const addMockScoreButton = document.getElementById('addMockScore');
+        const mockExamChartCanvas = document.getElementById('mockExamChart');
+
+        // --- Global Variables ---
+        let currentCfaLevelData = CFA_LEVEL_DATA[cfaLevelSelect.value]; // Initialize with default Level I data
+        let mockExamScores = []; // Stores the last 5 mock scores
+
+        // Chart.js instance
+        let mockChart;
+
         // --- Event Listeners ---
+        cfaLevelSelect.addEventListener('change', updateCfaLevelAndVisuals);
         timeInput.addEventListener('input', updateAllVisuals);
         progressInput.addEventListener('input', updateAllVisuals);
         practiceInput.addEventListener('input', updateAllVisuals);
         proficiencyInput.addEventListener('input', updateAllVisuals);
+        addMockScoreButton.addEventListener('click', addMockScore);
         resetButton.addEventListener('click', resetApp);
 
         // --- Update Functions ---
+
+        function updateCfaLevelAndVisuals() {
+            const selectedLevel = cfaLevelSelect.value;
+            currentCfaLevelData = CFA_LEVEL_DATA[selectedLevel];
+            // After updating currentCfaLevelData, re-run all visuals to reflect new targets
+            updateAllVisuals();
+            renderMockExamChart(); // Re-render chart if needed (though scores don't change by level)
+            console.log(`CFA Level set to: ${selectedLevel}, Recommended Hours: ${currentCfaLevelData.RECOMMENDED_TIME_HOURS}`);
+        }
+
         function updateTimeVisuals() {
             const hours = parseInt(timeInput.value) || 0;
-            const percentage = Math.min((hours / RECOMMENDED_TIME_HOURS) * 100, 100);
+            const percentage = Math.min((hours / currentCfaLevelData.RECOMMENDED_TIME_HOURS) * 100, 100);
             
             timeGaugeBar.style.width = `${percentage}%`;
             
-            if (hours >= RECOMMENDED_TIME_HOURS) {
+            if (hours >= currentCfaLevelData.RECOMMENDED_TIME_HOURS) {
                 timeGaugeBar.style.backgroundColor = 'var(--success-color)';
                 timeGaugeBar.textContent = 'Target Met!';
                 checkpointTime.classList.add('met');
-            } else if (hours >= RECOMMENDED_TIME_HOURS * 0.66) {
+            } else if (hours >= currentCfaLevelData.RECOMMENDED_TIME_HOURS * 0.66) {
                 timeGaugeBar.style.backgroundColor = 'var(--warning-color)';
                 timeGaugeBar.textContent = '';
                 checkpointTime.classList.remove('met');
@@ -459,10 +568,10 @@
                 checkpointTime.classList.remove('met');
             }
             
-            let feedback = `${hours} / ${RECOMMENDED_TIME_HOURS} hours recommended.`;
-            if (hours > RECOMMENDED_TIME_HOURS) {
+            let feedback = `${hours} / ${currentCfaLevelData.RECOMMENDED_TIME_HOURS} hours recommended.`;
+            if (hours > currentCfaLevelData.RECOMMENDED_TIME_HOURS) {
                 feedback += ` (Target Exceeded!)`;
-            } else if (hours === RECOMMENDED_TIME_HOURS) {
+            } else if (hours === currentCfaLevelData.RECOMMENDED_TIME_HOURS) {
                 feedback += ` (Target Met!)`;
             }
             timeFeedbackText.textContent = feedback;
@@ -474,7 +583,7 @@
             progressBarFill.textContent = `${progress}%`;
             progressFeedbackText.textContent = `${progress}% of curriculum completed.`;
 
-            if (progress >= READY_PROGRESS_THRESHOLD) { // Using 90% for checkpoint met
+            if (progress >= currentCfaLevelData.READY_PROGRESS_THRESHOLD) {
                 checkpointProgress.classList.add('met');
             } else {
                 checkpointProgress.classList.remove('met');
@@ -483,14 +592,14 @@
 
         function updatePracticeVisuals() {
             const questions = parseInt(practiceInput.value) || 0;
-            practiceFeedbackText.textContent = `${questions} / ${RECOMMENDED_PRACTICE_QUESTIONS} questions recommended.`;
+            practiceFeedbackText.textContent = `${questions} / ${currentCfaLevelData.RECOMMENDED_PRACTICE_QUESTIONS} questions recommended.`;
 
-            if (questions >= RECOMMENDED_PRACTICE_QUESTIONS) {
+            if (questions >= currentCfaLevelData.RECOMMENDED_PRACTICE_QUESTIONS) {
                 practiceMessage.textContent = "Excellent! You've met the recommended practice.";
                 practiceMessage.style.color = 'var(--success-color)';
                 checkpointPractice.classList.add('met');
-            } else if (questions >= RECOMMENDED_PRACTICE_QUESTIONS / 2) {
-                practiceMessage.textContent = `Getting closer! Aim for ${RECOMMENDED_PRACTICE_QUESTIONS}+.`;
+            } else if (questions >= currentCfaLevelData.RECOMMENDED_PRACTICE_QUESTIONS / 2) {
+                practiceMessage.textContent = `Getting closer! Aim for ${currentCfaLevelData.RECOMMENDED_PRACTICE_QUESTIONS}+.`;
                 practiceMessage.style.color = 'var(--warning-color)';
                 checkpointPractice.classList.remove('met');
             } else {
@@ -506,11 +615,11 @@
 
             proficiencyStatus.classList.remove('proficiency-low', 'proficiency-moderate', 'proficiency-good');
 
-            if (score >= TARGET_PROFICIENCY_SCORE) {
+            if (score >= currentCfaLevelData.TARGET_PROFICIENCY_SCORE) {
                 proficiencyStatus.textContent = 'Proficiency: Good';
                 proficiencyStatus.classList.add('proficiency-good');
                 checkpointProficiency.classList.add('met');
-            } else if (score >= PROFICIENCY_MODERATE_THRESHOLD) {
+            } else if (score >= currentCfaLevelData.PROFICIENCY_MODERATE_THRESHOLD) {
                 proficiencyStatus.textContent = 'Proficiency: Moderate';
                 proficiencyStatus.classList.add('proficiency-moderate');
                 checkpointProficiency.classList.remove('met');
@@ -527,43 +636,45 @@
             const practice = parseInt(practiceInput.value) || 0;
             const proficiency = parseInt(proficiencyInput.value) || 0;
 
-            const isTimeMet = time >= RECOMMENDED_TIME_HOURS;
-            const isProgressMet = progress >= READY_PROGRESS_THRESHOLD; // Using 90% for readiness
-            const isPracticeMet = practice >= RECOMMENDED_PRACTICE_QUESTIONS;
-            const isProficiencyMet = proficiency >= TARGET_PROFICIENCY_SCORE;
+            const isTimeMet = time >= currentCfaLevelData.RECOMMENDED_TIME_HOURS;
+            const isProgressMet = progress >= currentCfaLevelData.READY_PROGRESS_THRESHOLD;
+            const isPracticeMet = practice >= currentCfaLevelData.RECOMMENDED_PRACTICE_QUESTIONS;
+            const isProficiencyMet = proficiency >= currentCfaLevelData.TARGET_PROFICIENCY_SCORE;
 
             let messages = [];
             let allMet = true;
 
             if (!isTimeMet) {
-                messages.push(`<strong>Time:</strong> Dedicate at least ${RECOMMENDED_TIME_HOURS - time} more hours (Recommended: ${RECOMMENDED_TIME_HOURS}).`);
+                messages.push(`<strong>Time:</strong> Dedicate at least ${currentCfaLevelData.RECOMMENDED_TIME_HOURS - time} more hours (Recommended: ${currentCfaLevelData.RECOMMENDED_TIME_HOURS}).`);
                 allMet = false;
             }
             if (!isProgressMet) {
-                messages.push(`<strong>Progress:</strong> Complete at least ${Math.max(0, READY_PROGRESS_THRESHOLD - progress)}% more of the curriculum (Aim for 100%, minimum ${READY_PROGRESS_THRESHOLD}% for readiness).`);
+                messages.push(`<strong>Progress:</strong> Complete at least ${Math.max(0, currentCfaLevelData.READY_PROGRESS_THRESHOLD - progress)}% more of the curriculum (Aim for 100%, minimum ${currentCfaLevelData.READY_PROGRESS_THRESHOLD}% for readiness).`);
                 allMet = false;
             }
             if (!isPracticeMet) {
-                messages.push(`<strong>Practice:</strong> Attempt at least ${RECOMMENDED_PRACTICE_QUESTIONS - practice} more questions (Recommended: ${RECOMMENDED_PRACTICE_QUESTIONS}).`);
+                messages.push(`<strong>Practice:</strong> Attempt at least ${currentCfaLevelData.RECOMMENDED_PRACTICE_QUESTIONS - practice} more questions (Recommended: ${currentCfaLevelData.RECOMMENDED_PRACTICE_QUESTIONS}).`);
                 allMet = false;
             }
             if (!isProficiencyMet) {
-                messages.push(`<strong>Proficiency:</strong> Improve average score to ${TARGET_PROFICIENCY_SCORE}% or higher (Current: ${proficiency}%).`);
+                messages.push(`<strong>Proficiency:</strong> Improve average score to ${currentCfaLevelData.TARGET_PROFICIENCY_SCORE}% or higher (Current: ${proficiency}%).`);
                 allMet = false;
             }
 
             overallAssessmentDiv.classList.remove('ready', 'not-ready');
 
-            if (allMet && (timeInput.value && progressInput.value && practiceInput.value && proficiencyInput.value)) { // Check if all inputs have some value
+            // Check if any input has a value, not just all of them
+            const anyInputFilled = timeInput.value || progressInput.value || practiceInput.value || proficiencyInput.value;
+
+            if (allMet && anyInputFilled) {
                 assessmentStatus.textContent = 'Ready for the Exam!';
                 overallAssessmentDiv.classList.add('ready');
                 assessmentDetails.innerHTML = '<p>Congratulations! You appear to have met all key targets.</p>';
-            } else if (!timeInput.value && !progressInput.value && !practiceInput.value && !proficiencyInput.value) {
-                 assessmentStatus.textContent = 'Enter your data above';
-                 assessmentDetails.innerHTML = '<p>Input your study metrics to see your readiness assessment.</p>';
-                 overallAssessmentDiv.className = 'overall-assessment'; // Reset class
-            }
-            else {
+            } else if (!anyInputFilled) {
+                assessmentStatus.textContent = 'Enter your data above';
+                assessmentDetails.innerHTML = '<p>Input your study metrics to see your readiness assessment.</p>';
+                overallAssessmentDiv.className = 'overall-assessment'; // Reset class
+            } else {
                 assessmentStatus.textContent = 'Needs More Preparation';
                 overallAssessmentDiv.classList.add('not-ready');
                 let detailsHtml = '<p>Focus on these areas to improve your readiness:</p><ul>';
@@ -572,6 +683,83 @@
                 });
                 detailsHtml += '</ul>';
                 assessmentDetails.innerHTML = detailsHtml;
+            }
+        }
+
+        function renderMockExamChart() {
+            const ctx = mockExamChartCanvas.getContext('2d');
+
+            // Destroy previous chart instance if it exists
+            if (mockChart) {
+                mockChart.destroy();
+            }
+
+            mockChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: mockExamScores.map((_, index) => `Mock ${index + 1}`), // Labels for each score
+                    datasets: [{
+                        label: 'Mock Exam Score (%)',
+                        data: mockExamScores,
+                        borderColor: 'rgb(75, 192, 192)',
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        tension: 0.1,
+                        fill: false,
+                        pointBackgroundColor: 'rgb(75, 192, 192)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgb(75, 192, 192)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false, // Allow canvas to resize freely
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100, // Scores are 0-100
+                            title: {
+                                display: true,
+                                text: 'Score (%)'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Mock Exam Attempt'
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `Score: ${context.raw}%`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function addMockScore() {
+            const score = parseInt(mockScoreInput.value);
+            if (!isNaN(score) && score >= 0 && score <= 100) {
+                // Add score to the array
+                mockExamScores.push(score);
+                // Keep only the last 5 scores for the chart
+                if (mockExamScores.length > 5) {
+                    mockExamScores.shift(); // Remove the oldest score
+                }
+                mockScoreInput.value = ''; // Clear input field
+                renderMockExamChart(); // Update the chart
+            } else {
+                alert('Please enter a valid mock exam score between 0 and 100.');
             }
         }
 
@@ -584,20 +772,30 @@
         }
 
         function resetApp() {
+            // Reset inputs
             timeInput.value = '';
             progressInput.value = '';
             practiceInput.value = '';
             proficiencyInput.value = '';
-            
+            mockScoreInput.value = '';
+
+            // Reset mock scores and chart
+            mockExamScores = [];
+            if (mockChart) {
+                mockChart.destroy();
+                mockChart = null; // Clear the chart instance
+            }
+            renderMockExamChart(); // Re-render an empty chart
+
             // Reset visual indicators for checkpoints
             [checkpointTime, checkpointProgress, checkpointPractice, checkpointProficiency].forEach(cp => {
                 cp.classList.remove('met');
             });
 
-            // Call update functions to reset visuals to default
+            // Re-run all updates to reflect reset state (and current CFA level data)
             updateAllVisuals();
             
-            // Explicitly reset some text that might not clear with just updateAllVisuals on empty inputs
+            // Explicitly reset some text/classes that might not clear with just updateAllVisuals on empty inputs
             timeGaugeBar.textContent = '';
             progressBarFill.textContent = '0%';
             proficiencyStatus.textContent = 'Enter score';
@@ -610,7 +808,9 @@
 
         // --- Initial Load ---
         document.addEventListener('DOMContentLoaded', () => {
-            resetApp(); // Initialize the app to its default state
+            // Initialize the app with the default CFA level's data
+            updateCfaLevelAndVisuals(); 
+            resetApp(); // Ensure all fields and visuals are reset
         });
 
     </script>
