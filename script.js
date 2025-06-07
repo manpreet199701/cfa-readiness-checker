@@ -1,6 +1,6 @@
 // --- CFA Level Specific Data ---
 const CFA_LEVEL_DATA = {
-    "I": {
+    "I": {    
         RECOMMENDED_TIME_HOURS: 300,
         TOPICS: ["Ethical & Professional Standards", "Quantitative Methods", "Economics", "Financial Statement Analysis", "Corporate Issuers", "Equity Investments", "Fixed Income", "Derivatives", "Alternative Investments", "Portfolio Management"],
         // Add any other Level I specific variables
