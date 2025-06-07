@@ -523,6 +523,57 @@
             box-shadow: 0 6px 15px rgba(0,0,0,0.15);
         }
 
+        /* New LLM Feature Styles */
+        .llm-feature-section {
+            margin-top: 40px;
+            padding-top: 25px;
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+        }
+        .llm-feature-section h2 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            font-size: 1.8em;
+            font-weight: 700;
+        }
+        #generateTipButton {
+            padding: 12px 25px;
+            font-size: 1em;
+            color: white;
+            background: linear-gradient(to right, #4A90E2, #6A5ACD); /* Blue to SlateBlue gradient */
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        #generateTipButton:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+            background: linear-gradient(to right, #3A7BD5, #5A4AAD); /* Darker gradient on hover */
+        }
+        #studyTipOutput {
+            margin-top: 20px;
+            padding: 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            background-color: #FDFDFD;
+            min-height: 60px; /* Ensure some height for content */
+            text-align: left;
+            font-style: italic;
+            color: var(--secondary-color);
+            line-height: 1.8;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.03);
+            display: flex;
+            align-items: center; /* Vertically center content */
+            justify-content: center; /* Horizontally center content */
+        }
+        #studyTipOutput.loading {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
     </style>
 </head>
 <body>
@@ -624,6 +675,13 @@
                 <!-- Subjects will be dynamically loaded here -->
             </div>
             <div id="subject-completion-feedback"></div>
+        </div>
+
+        <!-- NEW: LLM-Powered Study Tip Generator -->
+        <div class="llm-feature-section">
+            <h2>✨ Personalized Study Tip ✨</h2>
+            <button id="generateTipButton">Generate Tip</button>
+            <div id="studyTipOutput">Click 'Generate Tip' to get a personalized study recommendation!</div>
         </div>
 
         <div id="overall-assessment" class="overall-assessment">
@@ -741,6 +799,10 @@
         const assessmentDetails = document.getElementById('assessment-details');
         const resetButton = document.getElementById('reset-button');
 
+        // New LLM Feature Elements
+        const generateTipButton = document.getElementById('generateTipButton');
+        const studyTipOutput = document.getElementById('studyTipOutput');
+
 
         // --- Global Variables ---
         let currentCfaLevelData = CFA_LEVEL_DATA[cfaLevelSelect.value]; // Initialize with default Level I data
@@ -753,6 +815,8 @@
         practiceInput.addEventListener('input', updateAllVisuals);
         proficiencyInput.addEventListener('input', updateAllVisuals);
         resetButton.addEventListener('click', resetApp);
+        generateTipButton.addEventListener('click', generateStudyTip); // Listener for the new LLM button
+
 
         // --- Update Functions ---
 
@@ -1081,6 +1145,81 @@
             
             // Re-initialize and update visuals for the default level
             updateCfaLevelAndVisuals(); 
+            studyTipOutput.textContent = "Click 'Generate Tip' to get a personalized study recommendation!"; // Reset tip output
+            studyTipOutput.classList.remove('loading');
+        }
+
+        /**
+         * Generates a personalized study tip using the Gemini API based on current user metrics.
+         */
+        async function generateStudyTip() {
+            studyTipOutput.textContent = 'Generating your personalized tip... ✨';
+            studyTipOutput.classList.add('loading');
+            generateTipButton.disabled = true; // Disable button while generating
+
+            const currentLevel = cfaLevelSelect.value;
+            const time = parseInt(timeInput.value) || 0;
+            const progress = parseInt(progressInput.value) || 0;
+            const practice = parseInt(practiceInput.value) || 0;
+            const proficiency = parseInt(proficiencyInput.value) || 0;
+
+            const subjectsForLevel = subjectProgress[currentLevel] || [];
+            let fullyCompletedSubjects = 0;
+            if (subjectsForLevel.length > 0) {
+                subjectsForLevel.forEach(subject => {
+                    if (subject.flashcards && subject.quizzes) {
+                        fullyCompletedSubjects++;
+                    }
+                });
+            }
+            const totalSubjects = subjectsForLevel.length;
+            const subjectCompletionPercentage = totalSubjects > 0 ? (fullyCompletedSubjects / totalSubjects) * 100 : 0;
+
+            // Constructing a detailed prompt for the LLM
+            const prompt = `You are an AI tutor for the CFA exam. Your goal is to provide a concise, actionable, and encouraging study tip (2-3 sentences max).
+            The user is currently studying for CFA Level ${currentLevel}.
+            Their study metrics are:
+            - Time Dedicated: ${time} hours (Recommended: ${currentCfaLevelData.RECOMMENDED_TIME_HOURS} hours)
+            - Curriculum Progress: ${progress}% (Target for readiness: ${currentCfaLevelData.READY_PROGRESS_THRESHOLD}%)
+            - Practice Questions: ${practice} attempted (Recommended: ${currentCfaLevelData.RECOMMENDED_PRACTICE_QUESTIONS} questions)
+            - Average Practice Exam Score: ${proficiency}% (Target for good proficiency: ${currentCfaLevelData.TARGET_PROFICIENCY_SCORE}%)
+            - Subject Completion: ${fullyCompletedSubjects} out of ${totalSubjects} subjects fully completed (${subjectCompletionPercentage.toFixed(0)}%) (Target: ${currentCfaLevelData.TARGET_SUBJECT_COMPLETION_PERCENT}%)
+
+            Based on these metrics, identify the area(s) needing the most attention or reinforcement. Provide a specific, positive, and actionable tip. If all areas seem good, offer a tip on advanced strategies, deep dives, or maintaining momentum.`;
+
+            let chatHistory = [];
+            chatHistory.push({ role: "user", parts: [{ text: prompt }] });
+            const payload = { contents: chatHistory };
+            const apiKey = ""; // Leave this as-is; Canvas will provide the key at runtime.
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    const text = result.candidates[0].content.parts[0].text;
+                    studyTipOutput.textContent = text;
+                    studyTipOutput.style.color = 'var(--text-color)'; // Reset text color
+                    studyTipOutput.style.fontStyle = 'normal'; // Reset font style
+                } else {
+                    studyTipOutput.textContent = 'Could not generate a tip. Please try again.';
+                    studyTipOutput.style.color = 'var(--danger-color)';
+                }
+            } catch (error) {
+                console.error('Error calling Gemini API:', error);
+                studyTipOutput.textContent = 'Failed to generate tip due to an API error. Please check your connection or try again later.';
+                studyTipOutput.style.color = 'var(--danger-color)';
+            } finally {
+                studyTipOutput.classList.remove('loading');
+                generateTipButton.disabled = false; // Re-enable button
+            }
         }
 
         // Initial render on page load
