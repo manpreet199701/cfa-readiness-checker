@@ -112,7 +112,7 @@ let currentCfaLevelData = CFA_LEVEL_DATA[currentCfaLevel];
 let subjects = []; // This will hold the current level's subjects with their checked status
 
 // --- Backend Proxy URL for Study Tips (IMPORTANT: REPLACE WITH YOUR DEPLOYED BACKEND URL) ---
-const AI_BACKEND_URL_STUDY_TIP = 'YOUR_DEPLOYED_BACKEND_URL/api/generate-study-tip';
+const AI_BACKEND_URL_STUDY_TIP = 'https://manpreet199701.github.io/cfa-readiness-checker/';
 
 
 // --- Helper Functions ---
