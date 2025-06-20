@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CFA Certification Readiness Checker</title>
+    <!-- Marked.js CDN for Markdown parsing (still needed for study tip) -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
-        /* Updated Color Palette for more vibrancy and study-friendliness */
+        /* Your existing CSS for index.html */
         :root {
             --primary-color: #4A90E2; /* Vibrant Blue */
             --primary-light: #87CEEB; /* Lighter shade of primary for gradients */
@@ -21,6 +23,7 @@
             --checkpoint-default-color: #B0BEC5; /* Muted grey for checkpoints */
             --checkpoint-met-color: var(--success-color);
             --border-color: #D3DCE6; /* Slightly more distinct border */
+            --dark-color: #555555; /* Added for tooltip */
         }
 
         body {
@@ -28,43 +31,40 @@
             line-height: 1.6;
             margin: 0;
             padding: 20px;
-            /* Added a subtle linear gradient background to the body */
             background: linear-gradient(to bottom right, var(--light-bg-color-start), var(--light-bg-color-end));
             color: var(--text-color);
             display: flex;
             flex-direction: column;
             align-items: center;
-            min-height: 100vh; /* Ensure background covers full viewport height */
+            min-height: 100vh;
         }
 
         .container {
             background-color: var(--card-bg-color);
-            padding: 30px; /* Increased padding */
-            border-radius: 12px; /* More rounded corners */
-            box-shadow: 0 10px 30px rgba(0,0,0,0.08); /* Enhanced shadow for depth */
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
             width: 100%;
-            max-width: 850px; /* Slightly wider */
-            box-sizing: border-box; /* Include padding in width */
+            max-width: 850px;
+            box-sizing: border-box;
         }
 
         h1 {
-            color: #FFFFFF; /* White text for contrast against background image/gradient */
+            color: #FFFFFF;
             text-align: center;
-            margin-bottom: 25px; /* More space */
-            font-size: 2.2em; /* Larger title */
-            font-weight: 700; /* Bolder */
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.6); /* Stronger text shadow for readability */
-            padding: 25px 0; /* Increased padding to give space for gradient */
-            border-radius: 8px; /* Rounded corners for the headline box */
-            /* Using a vibrant linear gradient for the headline background */
-            background: linear-gradient(to right, #4A90E2, #7B68EE); /* Blue to MediumPurple gradient */
+            margin-bottom: 25px;
+            font-size: 2.2em;
+            font-weight: 700;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.6);
+            padding: 25px 0;
+            border-radius: 8px;
+            background: linear-gradient(to right, #4A90E2, #7B68EE);
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
             box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
 
-        /* Controls (Select Level) */
         .controls {
             display: flex;
             justify-content: center;
@@ -72,14 +72,14 @@
             margin-bottom: 30px;
         }
         .controls label {
-            font-weight: 600; /* Semi-bold */
+            font-weight: 600;
             color: var(--primary-color);
-            margin-right: 15px; /* More space */
+            margin-right: 15px;
             font-size: 1.1em;
         }
         .controls select {
-            padding: 10px 15px; /* Increased padding */
-            border-radius: 8px; /* More rounded */
+            padding: 10px 15px;
+            border-radius: 8px;
             border: 1px solid var(--border-color);
             background-color: var(--card-bg-color);
             font-size: 1em;
@@ -90,19 +90,16 @@
         .controls select:focus {
             border-color: var(--primary-color);
             outline: none;
-            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2); /* Soft focus glow */
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
         }
 
-
-        /* Metaphor Area */
         .metaphor-area {
-            margin-bottom: 40px; /* More spacing */
-            padding: 25px; /* Increased padding */
+            margin-bottom: 40px;
+            padding: 25px;
             border: 1px solid var(--border-color);
-            border-radius: 10px; /* More rounded */
-            /* Added a subtle gradient background to the metaphor area */
+            border-radius: 10px;
             background: linear-gradient(to top left, #F8F8F8, #F0F4F8); 
-            box-shadow: inset 0 0 8px rgba(0,0,0,0.03); /* Subtle inner shadow */
+            box-shadow: inset 0 0 8px rgba(0,0,0,0.03);
         }
         .metaphor-area p {
             font-size: 1.05em;
@@ -124,11 +121,11 @@
             left: 5%;
             right: 5%;
             top: 50%;
-            height: 8px; /* Thicker line */
+            height: 8px;
             background-color: var(--track-color);
             z-index: 1;
             transform: translateY(-50%);
-            border-radius: 4px; /* Rounded line ends */
+            border-radius: 4px;
         }
 
         .track-point {
@@ -140,52 +137,50 @@
             color: var(--secondary-color);
             position: relative;
             z-index: 2;
-            width: 18%; /* Adjusted for 6 points */
-            transition: transform 0.3s ease; /* Smooth transition for hover/met */
+            width: 18%;
+            transition: transform 0.3s ease;
         }
         .track-point:hover {
-            transform: translateY(-3px); /* Subtle lift on hover */
+            transform: translateY(-3px);
         }
         
         .track-point .icon {
-            width: 32px; /* Larger icons */
+            width: 32px;
             height: 32px;
             border-radius: 50%;
             background-color: var(--checkpoint-default-color);
-            border: 3px solid var(--card-bg-color); /* Thicker white border */
-            box-shadow: 0 4px 10px rgba(0,0,0,0.15); /* More prominent shadow */
-            margin-bottom: 8px; /* More space */
+            border: 3px solid var(--card-bg-color);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            margin-bottom: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
             font-weight: bold;
             font-size: 1.1em;
-            transition: all 0.3s ease; /* Smooth transition for met state */
+            transition: all 0.3s ease;
         }
         .track-point.start .icon, .track-point.finish .icon {
             background-color: var(--primary-color);
-            width: 36px; /* Slightly larger start/finish */
+            width: 36px;
             height: 36px;
-            box-shadow: 0 6px 15px rgba(74, 144, 226, 0.4); /* Blue glow */
+            box-shadow: 0 6px 15px rgba(74, 144, 226, 0.4);
         }
         .track-point.checkpoint.met .icon {
             background-color: var(--checkpoint-met-color);
-            transform: scale(1.1); /* Pop effect on met */
-            box-shadow: 0 6px 15px rgba(76, 175, 80, 0.4); /* Green glow */
+            transform: scale(1.1);
+            box-shadow: 0 6px 15px rgba(76, 175, 80, 0.4);
         }
         .track-point .label {
             margin-top: 5px;
-            font-weight: 600; /* Semi-bold */
+            font-weight: 600;
             color: var(--text-color);
         }
 
-
-        /* Inputs Area */
         .inputs-area {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 25px; /* Increased gap */
+            gap: 25px;
             margin-bottom: 40px;
         }
 
@@ -197,10 +192,10 @@
 
         .factor-input {
             background-color: var(--card-bg-color);
-            padding: 20px; /* Increased padding */
+            padding: 20px;
             border: 1px solid var(--border-color);
-            border-radius: 10px; /* More rounded */
-            box-shadow: 0 5px 15px rgba(0,0,0,0.06); /* Subtle shadow */
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.06);
             transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
         .factor-input:hover {
@@ -210,19 +205,19 @@
 
         .factor-input label {
             display: block;
-            margin-bottom: 10px; /* More space */
-            font-weight: 600; /* Semi-bold */
+            margin-bottom: 10px;
+            font-weight: 600;
             color: var(--primary-color);
             font-size: 1.05em;
         }
 
         .factor-input input[type="number"],
         .factor-input select {
-            width: calc(100% - 22px); /* Adjusted for padding */
-            padding: 12px; /* More padding */
+            width: calc(100% - 22px);
+            padding: 12px;
             border: 1px solid var(--border-color);
-            border-radius: 6px; /* Slightly rounded */
-            margin-bottom: 15px; /* More space */
+            border-radius: 6px;
+            margin-bottom: 15px;
             box-sizing: border-box;
             font-size: 1em;
             color: var(--text-color);
@@ -243,12 +238,11 @@
             color: var(--secondary-color);
         }
 
-        /* Time Gauge */
         .time-gauge-container {
             width: 100%;
             background-color: var(--track-color);
             border-radius: 6px;
-            height: 22px; /* Slightly taller */
+            height: 22px;
             margin-bottom: 8px;
             overflow: hidden;
             box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
@@ -256,32 +250,27 @@
         .time-gauge-bar {
             height: 100%;
             width: 0%;
-            /* More defined gradient for time gauge */
-            background: linear-gradient(to right, #F44336, #FFC107, #4CAF50); /* Red to Yellow to Green */
+            background: linear-gradient(to right, #F44336, #FFC107, #4CAF50);
             text-align: center;
             line-height: 22px;
             color: white;
             font-size: 0.85em;
             font-weight: 600;
-            transition: width 0.4s ease, background-position 0.4s ease; /* Transition for gradient position */
-            background-size: 200% 100%; /* For gradient transition */
-            background-position: 100% 0; /* Start at the end of the gradient */
+            transition: width 0.4s ease, background-position 0.4s ease;
+            background-size: 200% 100%;
+            background-position: 100% 0;
         }
-        /* Adjust gradient position based on percentage */
         .time-gauge-bar[style*="width: 0%"] { background-position: 0% 0; }
-        .time-gauge-bar[style*="width: 1%"] { background-position: 0% 0; } /* Starting point */
-        /* Note: For simplicity, the JS directly sets background-color to success-color for 100% */
+        .time-gauge-bar[style*="width: 1%"] { background-position: 0% 0; }
         .time-gauge-bar[style*="background-color: var(--success-color)"] {
-             background: var(--success-color); /* Override gradient for full success color */
+             background: var(--success-color);
         }
-
 
         #time-feedback-text {
             margin-top: 5px;
             color: var(--text-color);
         }
 
-        /* Progress Bar */
         .progress-bar-container {
             width: 100%;
             background-color: var(--track-color);
@@ -295,7 +284,6 @@
         .progress-bar-fill {
             height: 100%;
             width: 0%;
-            /* Gradient for progress bar */
             background: linear-gradient(to right, var(--primary-color), var(--primary-light));
             text-align: center;
             line-height: 22px;
@@ -324,10 +312,10 @@
             opacity: 0;
             transition: opacity 0.3s;
             font-size: 0.8em;
-            white-space: nowrap; /* Prevent tooltip text from wrapping */
+            white-space: nowrap;
             box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
-        .tooltip::after { /* Tooltip arrow */
+        .tooltip::after {
             content: "";
             position: absolute;
             top: 100%;
@@ -342,26 +330,23 @@
             opacity: 1;
         }
 
-
-        /* Practice Counter */
         #practice-feedback-text {
             margin-top: 5px;
             color: var(--text-color);
         }
         #practice-message {
             font-weight: 600;
-            margin-top: 8px; /* Added margin */
+            margin-top: 8px;
             font-size: 1em;
         }
 
-        /* Proficiency Status */
         #proficiency-status {
-            padding: 10px; /* More padding */
-            border-radius: 6px; /* More rounded */
+            padding: 10px;
+            border-radius: 6px;
             text-align: center;
-            font-weight: 700; /* Bolder */
+            font-weight: 700;
             color: white;
-            margin-top: 8px; /* More space */
+            margin-top: 8px;
             transition: background-color 0.3s ease;
         }
         .proficiency-low { background-color: var(--danger-color); }
@@ -372,7 +357,6 @@
             color: var(--text-color);
         }
 
-        /* Subject Progress Section */
         .subject-progress-section {
             margin-top: 40px;
             padding-top: 25px;
@@ -388,7 +372,7 @@
         .subject-list {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 20px; /* Increased gap */
+            gap: 20px;
         }
         @media (min-width: 600px) {
             .subject-list {
@@ -409,32 +393,43 @@
         }
         .subject-item h3 {
             margin-top: 0;
-            margin-bottom: 12px; /* More space */
+            margin-bottom: 12px;
             color: var(--primary-color);
-            font-size: 1.2em; /* Slightly larger */
+            font-size: 1.2em;
             font-weight: 600;
         }
+        /* Make the subject name itself clickable */
+        .subject-item h3 a {
+            color: inherit;
+            text-decoration: none;
+            cursor: pointer;
+            transition: color 0.2s ease;
+        }
+        .subject-item h3 a:hover {
+            color: var(--primary-light);
+        }
+
         .subject-checkboxes label {
             display: flex;
             align-items: center;
-            margin-bottom: 8px; /* More space */
-            font-size: 1em; /* Slightly larger text */
+            margin-bottom: 8px;
+            font-size: 1em;
             color: var(--text-color);
-            cursor: pointer; /* Indicate clickable */
+            cursor: pointer;
             transition: color 0.2s ease;
         }
         .subject-checkboxes label:hover {
             color: var(--primary-color);
         }
         .subject-checkboxes input[type="checkbox"] {
-            margin-right: 10px; /* More space */
-            transform: scale(1.2); /* Even larger checkboxes */
-            accent-color: var(--primary-color); /* Color for checked state */
+            margin-right: 10px;
+            transform: scale(1.2);
+            accent-color: var(--primary-color);
         }
         .subject-status {
             font-size: 0.9em;
             text-align: right;
-            margin-top: 10px; /* More space */
+            margin-top: 10px;
             font-weight: 600;
         }
         .subject-status.completed {
@@ -445,16 +440,14 @@
         }
         #subject-completion-feedback {
             text-align: center;
-            margin-top: 25px; /* More space */
+            margin-top: 25px;
             font-weight: 700;
             font-size: 1.1em;
         }
         .checkpoint-subjects {
-            background-color: #adb5bd; /* Default grey */
+            background-color: #adb5bd;
         }
 
-
-        /* Overall Assessment */
         .overall-assessment {
             margin-top: 40px;
             padding: 25px;
@@ -464,18 +457,18 @@
             transition: all 0.3s ease;
         }
         .overall-assessment.ready {
-            background-color: #E8F5E9; /* Lighter success shade */
+            background-color: #E8F5E9;
             border: 1px solid var(--success-color);
         }
         .overall-assessment.not-ready {
-            background-color: #FFEBEE; /* Lighter danger shade */
+            background-color: #FFEBEE;
             border: 1px solid var(--danger-color);
         }
         #assessment-status {
-            font-size: 1.8em; /* Larger status */
+            font-size: 1.8em;
             margin-bottom: 15px;
             font-weight: 700;
-            color: var(--text-color); /* Default color */
+            color: var(--text-color);
         }
         .ready #assessment-status { color: var(--success-color); }
         .not-ready #assessment-status { color: var(--danger-color); }
@@ -488,42 +481,39 @@
             list-style-type: none;
             padding-left: 0;
             text-align: left;
-            display: inline-block; /* Center the list block */
+            display: inline-block;
             margin-top: 15px;
         }
          #assessment-details ul li {
-            margin-bottom: 8px; /* More spacing */
+            margin-bottom: 8px;
             line-height: 1.4;
          }
          #assessment-details strong {
-            color: var(--text-color); /* Make strong text stand out more */
+            color: var(--text-color);
          }
 
-        /* Reset Button */
         .reset-button-container {
             text-align: center;
-            margin-top: 40px; /* More space */
+            margin-top: 40px;
         }
         #reset-button {
-            padding: 15px 35px; /* Larger button */
-            font-size: 1.1em; /* Larger text */
+            padding: 15px 35px;
+            font-size: 1.1em;
             color: white;
-            /* Gradient for reset button */
-            background: linear-gradient(to right, var(--secondary-color), #888888); /* Grey gradient */
+            background: linear-gradient(to right, var(--secondary-color), #888888);
             border: none;
-            border-radius: 8px; /* More rounded */
+            border-radius: 8px;
             cursor: pointer;
             transition: background-color 0.3s ease, transform 0.2s ease, box-shadow 0.2s ease;
             font-weight: 600;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
         }
         #reset-button:hover {
-            background: linear-gradient(to right, var(--dark-color), #555555); /* Darker grey gradient on hover */
-            transform: translateY(-2px); /* Slight lift */
+            background: linear-gradient(to right, var(--dark-color), #555555);
+            transform: translateY(-2px);
             box-shadow: 0 6px 15px rgba(0,0,0,0.15);
         }
 
-        /* New LLM Feature Styles */
         .llm-feature-section {
             margin-top: 40px;
             padding-top: 25px;
@@ -540,7 +530,7 @@
             padding: 12px 25px;
             font-size: 1em;
             color: white;
-            background: linear-gradient(to right, #4A90E2, #6A5ACD); /* Blue to SlateBlue gradient */
+            background: linear-gradient(to right, #4A90E2, #6A5ACD);
             border: none;
             border-radius: 8px;
             cursor: pointer;
@@ -551,7 +541,7 @@
         #generateTipButton:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 15px rgba(0,0,0,0.15);
-            background: linear-gradient(to right, #3A7BD5, #5A4AAD); /* Darker gradient on hover */
+            background: linear-gradient(to right, #3A7BD5, #5A4AAD);
         }
         #studyTipOutput {
             margin-top: 20px;
@@ -559,21 +549,22 @@
             border: 1px solid var(--border-color);
             border-radius: 10px;
             background-color: #FDFDFD;
-            min-height: 60px; /* Ensure some height for content */
+            min-height: 60px;
             text-align: left;
             font-style: italic;
             color: var(--secondary-color);
             line-height: 1.8;
             box-shadow: inset 0 2px 5px rgba(0,0,0,0.03);
             display: flex;
-            align-items: center; /* Vertically center content */
-            justify-content: center; /* Horizontally center content */
+            align-items: center;
+            justify-content: center;
         }
         #studyTipOutput.loading {
             color: var(--primary-color);
             font-weight: 600;
         }
 
+        /* No AI explainer section on this page anymore */
     </style>
 </head>
 <body>
@@ -614,7 +605,7 @@
                     <div class="icon">S%</div>
                     <div class="label">Proficiency</div>
                 </div>
-                 <div id="checkpoint-subjects" class="track-point checkpoint">
+                   <div id="checkpoint-subjects" class="track-point checkpoint">
                     <div class="icon">Sub</div>
                     <div class="label">Subjects</div>
                 </div>
@@ -695,537 +686,6 @@
 
     </div>
 
-    <script>
-        // --- Configuration (Dynamic based on CFA Level) ---
-        const CFA_LEVEL_DATA = {
-            "I": {
-                RECOMMENDED_TIME_HOURS: 300,
-                RECOMMENDED_PRACTICE_QUESTIONS: 2000,
-                TARGET_PROFICIENCY_SCORE: 70, // Minimum for "Good"
-                PROFICIENCY_MODERATE_THRESHOLD: 60,
-                TARGET_PROGRESS_PERCENT: 100, // Ideal
-                READY_PROGRESS_THRESHOLD: 90, // Minimum for "Ready" status
-                TARGET_SUBJECT_COMPLETION_PERCENT: 90 // Target percentage of subjects with both F/Q completed
-            },
-            "II": {
-                RECOMMENDED_TIME_HOURS: 320,
-                RECOMMENDED_PRACTICE_QUESTIONS: 2500,
-                TARGET_PROFICIENCY_SCORE: 70,
-                PROFICIENCY_MODERATE_THRESHOLD: 60,
-                TARGET_PROGRESS_PERCENT: 100,
-                READY_PROGRESS_THRESHOLD: 90,
-                TARGET_SUBJECT_COMPLETION_PERCENT: 90
-            },
-            "III": {
-                RECOMMENDED_TIME_HOURS: 350,
-                RECOMMENDED_PRACTICE_QUESTIONS: 3000,
-                TARGET_PROFICIENCY_SCORE: 75, // Often higher for Level III
-                PROFICIENCY_MODERATE_THRESHOLD: 65,
-                TARGET_PROGRESS_PERCENT: 100,
-                READY_PROGRESS_THRESHOLD: 90,
-                TARGET_SUBJECT_COMPLETION_PERCENT: 95 // Higher for Level III
-            }
-        };
-
-        const CFA_LEVEL_SUBJECTS_MASTER = {
-            "I": [
-                { name: "Ethical and Professional Standards", flashcards: false, quizzes: false },
-                { name: "Quantitative Methods", flashcards: false, quizzes: false },
-                { name: "Economics", flashcards: false, quizzes: false },
-                { name: "Financial Statement Analysis", flashcards: false, quizzes: false },
-                { name: "Corporate Issuers", flashcards: false, quizzes: false },
-                { name: "Equity Investments", flashcards: false, quizzes: false },
-                { name: "Fixed Income", flashcards: false, quizzes: false },
-                { name: "Derivatives", flashcards: false, quizzes: false },
-                { name: "Alternative Investments", flashcards: false, quizzes: false },
-                { name: "Portfolio Management and Wealth Management", flashcards: false, quizzes: false },
-            ],
-            "II": [
-                { name: "Ethical and Professional Standards", flashcards: false, quizzes: false },
-                { name: "Quantitative Methods for Valuations", flashcards: false, quizzes: false },
-                { name: "Economics for Valuation", flashcards: false, quizzes: false },
-                { name: "Financial Statement Analysis for Valuation", flashcards: false, quizzes: false },
-                { name: "Corporate Issuers for Valuation", flashcards: false, quizzes: false },
-                { name: "Equity Valuation", flashcards: false, quizzes: false },
-                { name: "Fixed Income Valuation", flashcards: false, quizzes: false },
-                { name: "Derivatives and Risk Management", flashcards: false, quizzes: false },
-                { name: "Alternative Investments", flashcards: false, quizzes: false },
-                { name: "Portfolio Management", flashcards: false, quizzes: false },
-            ],
-            "III": [
-                { name: "Ethical and Professional Standards", flashcards: false, quizzes: false },
-                { name: "Behavioral Finance", flashcards: false, quizzes: false },
-                { name: "Private Wealth Management", flashcards: false, quizzes: false },
-                { name: "Institutional Investors", flashcards: false, quizzes: false },
-                { name: "Risk Management", flashcards: false, quizzes: false },
-                { name: "Asset Allocation", flashcards: false, quizzes: false },
-                { name: "Fixed Income and Derivatives Strategies", flashcards: false, quizzes: false },
-                { name: "Equity Strategies", flashcards: false, quizzes: false },
-                { name: "Alternative Investments Strategies", flashcards: false, quizzes: false },
-                { name: "Portfolio Management and Performance Evaluation", flashcards: false, quizzes: false },
-            ]
-        };
-
-        // --- DOM Elements ---
-        const cfaLevelSelect = document.getElementById('cfaLevel');
-
-        const timeInput = document.getElementById('time-input');
-        const timeGaugeBar = document.getElementById('time-gauge-bar');
-        const timeFeedbackText = document.getElementById('time-feedback-text');
-        const checkpointTime = document.getElementById('checkpoint-time');
-
-        const progressInput = document.getElementById('progress-input');
-        const progressBarFill = document.getElementById('progress-bar-fill');
-        const progressFeedbackText = document.getElementById('progress-feedback-text');
-        const checkpointProgress = document.getElementById('checkpoint-progress');
-
-        const practiceInput = document.getElementById('practice-input');
-        const practiceFeedbackText = document.getElementById('practice-feedback-text');
-        const practiceMessage = document.getElementById('practice-message');
-        const checkpointPractice = document.getElementById('checkpoint-practice');
-
-        const proficiencyInput = document.getElementById('proficiency-input');
-        const proficiencyStatus = document.getElementById('proficiency-status');
-        const proficiencyScoreText = document.getElementById('proficiency-score-text');
-        const checkpointProficiency = document.getElementById('checkpoint-proficiency');
-
-        const subjectListContainer = document.getElementById('subject-list-container');
-        const subjectCompletionFeedback = document.getElementById('subject-completion-feedback');
-        const checkpointSubjects = document.getElementById('checkpoint-subjects');
-
-
-        const overallAssessmentDiv = document.getElementById('overall-assessment');
-        const assessmentStatus = document.getElementById('assessment-status');
-        const assessmentDetails = document.getElementById('assessment-details');
-        const resetButton = document.getElementById('reset-button');
-
-        // New LLM Feature Elements
-        const generateTipButton = document.getElementById('generateTipButton');
-        const studyTipOutput = document.getElementById('studyTipOutput');
-
-
-        // --- Global Variables ---
-        let currentCfaLevelData = CFA_LEVEL_DATA[cfaLevelSelect.value]; // Initialize with default Level I data
-        let subjectProgress = {}; // Stores completion status for subjects of the *current* level
-
-        // --- Event Listeners ---
-        cfaLevelSelect.addEventListener('change', updateCfaLevelAndVisuals);
-        timeInput.addEventListener('input', updateAllVisuals);
-        progressInput.addEventListener('input', updateAllVisuals);
-        practiceInput.addEventListener('input', updateAllVisuals);
-        proficiencyInput.addEventListener('input', updateAllVisuals);
-        resetButton.addEventListener('click', resetApp);
-        generateTipButton.addEventListener('click', generateStudyTip); // Listener for the new LLM button
-
-
-        // --- Update Functions ---
-
-        function updateCfaLevelAndVisuals() {
-            const selectedLevel = cfaLevelSelect.value;
-            currentCfaLevelData = CFA_LEVEL_DATA[selectedLevel];
-            
-            // Initialize subject progress for the selected level if not already present
-            if (!subjectProgress[selectedLevel]) {
-                // Deep copy the master subject data to avoid modifying the original config
-                subjectProgress[selectedLevel] = JSON.parse(JSON.stringify(CFA_LEVEL_SUBJECTS_MASTER[selectedLevel]));
-            }
-
-            // After updating currentCfaLevelData, re-run all visuals to reflect new targets
-            updateAllVisuals();
-            renderSubjects(); // Render subjects specific to the new level
-            console.log(`CFA Level set to: ${selectedLevel}, Recommended Hours: ${currentCfaLevelData.RECOMMENDED_TIME_HOURS}`);
-        }
-
-        function updateTimeVisuals() {
-            const hours = parseInt(timeInput.value) || 0;
-            const percentage = Math.min((hours / currentCfaLevelData.RECOMMENDED_TIME_HOURS) * 100, 100);
-            
-            timeGaugeBar.style.width = `${percentage}%`;
-            
-            // Adjust gradient position based on progress
-            if (hours < currentCfaLevelData.RECOMMENDED_TIME_HOURS) {
-                const gradientPos = (percentage / 100) * 100; // Map 0-100% to 0-100% for gradient position
-                timeGaugeBar.style.backgroundPosition = `${100 - gradientPos}% 0`; // Inverse for right-to-left fill
-                timeGaugeBar.textContent = ''; // Clear text content when not at target
-                timeGaugeBar.style.background = `linear-gradient(to right, #F44336, #FFC107, #4CAF50)`; /* Red to Yellow to Green */
-                timeGaugeBar.style.backgroundSize = `200% 100%`;
-            } else {
-                timeGaugeBar.style.background = 'var(--success-color)'; // Use solid color when target met
-                timeGaugeBar.textContent = 'Target Met!';
-                timeGaugeBar.style.backgroundPosition = '0% 0'; // Reset gradient position for solid color
-            }
-
-
-            if (hours >= currentCfaLevelData.RECOMMENDED_TIME_HOURS) {
-                checkpointTime.classList.add('met');
-            } else {
-                checkpointTime.classList.remove('met');
-            }
-            
-            let feedback = `${hours} / ${currentCfaLevelData.RECOMMENDED_TIME_HOURS} hours recommended.`;
-            if (hours > currentCfaLevelData.RECOMMENDED_TIME_HOURS) {
-                feedback += ` (Target Exceeded!)`;
-            } else if (hours === currentCfaLevelData.RECOMMENDED_TIME_HOURS) {
-                feedback += ` (Target Met!)`;
-            }
-            timeFeedbackText.textContent = feedback;
-        }
-
-        function updateProgressVisuals() {
-            const progress = parseInt(progressInput.value) || 0;
-            progressBarFill.style.width = `${progress}%`;
-            progressBarFill.textContent = `${progress}%`;
-            progressFeedbackText.textContent = `${progress}% of curriculum completed.`;
-
-            if (progress >= currentCfaLevelData.READY_PROGRESS_THRESHOLD) {
-                checkpointProgress.classList.add('met');
-            } else {
-                checkpointProgress.classList.remove('met');
-            }
-        }
-
-        function updatePracticeVisuals() {
-            const questions = parseInt(practiceInput.value) || 0;
-            practiceFeedbackText.textContent = `${questions} / ${currentCfaLevelData.RECOMMENDED_PRACTICE_QUESTIONS} questions recommended.`;
-
-            if (questions >= currentCfaLevelData.RECOMMENDED_PRACTICE_QUESTIONS) {
-                practiceMessage.textContent = "Excellent! You've met the recommended practice.";
-                practiceMessage.style.color = 'var(--success-color)';
-                checkpointPractice.classList.add('met');
-            } else if (questions >= currentCfaLevelData.RECOMMENDED_PRACTICE_QUESTIONS / 2) {
-                practiceMessage.textContent = `Getting closer! Aim for ${currentCfaLevelData.RECOMMENDED_PRACTICE_QUESTIONS}+.`;
-                practiceMessage.style.color = 'var(--warning-color)';
-                checkpointPractice.classList.remove('met');
-            } else {
-                practiceMessage.textContent = "You're on your way, keep practicing!";
-                practiceMessage.style.color = 'var(--secondary-color)';
-                checkpointPractice.classList.remove('met');
-            }
-        }
-
-        function updateProficiencyVisuals() {
-            const score = parseInt(proficiencyInput.value) || 0;
-            proficiencyScoreText.textContent = `Average Score: ${score}%`;
-
-            proficiencyStatus.classList.remove('proficiency-low', 'proficiency-moderate', 'proficiency-good');
-
-            if (score >= currentCfaLevelData.TARGET_PROFICIENCY_SCORE) {
-                proficiencyStatus.textContent = 'Proficiency: Good';
-                proficiencyStatus.classList.add('proficiency-good');
-                checkpointProficiency.classList.add('met');
-            } else if (score >= currentCfaLevelData.PROFICIENCY_MODERATE_THRESHOLD) {
-                proficiencyStatus.textContent = 'Proficiency: Moderate';
-                proficiencyStatus.classList.add('proficiency-moderate');
-                checkpointProficiency.classList.remove('met');
-            } else {
-                proficiencyStatus.textContent = 'Proficiency: Low';
-                proficiencyStatus.classList.add('proficiency-low');
-                checkpointProficiency.classList.remove('met');
-            }
-        }
-
-        function renderSubjects() {
-            subjectListContainer.innerHTML = ''; // Clear existing subjects
-
-            const currentLevel = cfaLevelSelect.value;
-            const subjectsForLevel = subjectProgress[currentLevel]; // Get the active subject progress for the current level
-
-            if (!subjectsForLevel || subjectsForLevel.length === 0) {
-                subjectListContainer.innerHTML = '<p style="text-align: center; font-style: italic;">No subjects defined for this CFA Level.</p>';
-                return;
-            }
-
-            subjectsForLevel.forEach((subject, index) => {
-                const subjectItem = document.createElement('div');
-                subjectItem.classList.add('subject-item');
-
-                const subjectName = document.createElement('h3');
-                subjectName.textContent = subject.name;
-                subjectItem.appendChild(subjectName);
-
-                const checkboxesDiv = document.createElement('div');
-                checkboxesDiv.classList.add('subject-checkboxes');
-
-                // Flashcards Checkbox
-                const flashcardsLabel = document.createElement('label');
-                const flashcardsCheckbox = document.createElement('input');
-                flashcardsCheckbox.type = 'checkbox';
-                flashcardsCheckbox.checked = subject.flashcards;
-                flashcardsCheckbox.dataset.subjectIndex = index; // Store index to identify subject
-                flashcardsCheckbox.dataset.type = 'flashcards';
-                flashcardsCheckbox.addEventListener('change', handleSubjectCheckboxChange);
-                flashcardsLabel.appendChild(flashcardsCheckbox);
-                flashcardsLabel.innerHTML += ' Flashcards Completed';
-                checkboxesDiv.appendChild(flashcardsLabel);
-
-                // Quizzes Checkbox
-                const quizzesLabel = document.createElement('label');
-                const quizzesCheckbox = document.createElement('input');
-                quizzesCheckbox.type = 'checkbox';
-                quizzesCheckbox.checked = subject.quizzes;
-                quizzesCheckbox.dataset.subjectIndex = index;
-                quizzesCheckbox.dataset.type = 'quizzes';
-                quizzesCheckbox.addEventListener('change', handleSubjectCheckboxChange);
-                quizzesLabel.appendChild(quizzesCheckbox);
-                quizzesLabel.innerHTML += ' Quizzes Completed';
-                checkboxesDiv.appendChild(quizzesLabel);
-
-                subjectItem.appendChild(checkboxesDiv);
-
-                const statusSpan = document.createElement('div');
-                statusSpan.classList.add('subject-status');
-                updateSubjectItemStatus(statusSpan, subject.flashcards, subject.quizzes);
-                subjectItem.appendChild(statusSpan);
-
-                subjectListContainer.appendChild(subjectItem);
-            });
-            updateSubjectCompletionVisuals(); // Update overall subject completion feedback
-        }
-
-        function handleSubjectCheckboxChange(event) {
-            const index = parseInt(event.target.dataset.subjectIndex);
-            const type = event.target.dataset.type;
-            const isChecked = event.target.checked;
-
-            const currentLevel = cfaLevelSelect.value;
-            subjectProgress[currentLevel][index][type] = isChecked;
-
-            // Update status within the subject item (optional, but good UX)
-            const subjectItem = event.target.closest('.subject-item');
-            const statusSpan = subjectItem.querySelector('.subject-status');
-            updateSubjectItemStatus(statusSpan, 
-                                   subjectProgress[currentLevel][index].flashcards, 
-                                   subjectProgress[currentLevel][index].quizzes);
-
-            updateSubjectCompletionVisuals(); // Re-calculate and update overall subject completion
-            updateOverallAssessment(); // Re-evaluate overall readiness
-        }
-
-        function updateSubjectItemStatus(statusSpan, flashcardsDone, quizzesDone) {
-            statusSpan.classList.remove('completed', 'incomplete');
-            if (flashcardsDone && quizzesDone) {
-                statusSpan.textContent = 'All Done!';
-                statusSpan.classList.add('completed');
-            } else if (flashcardsDone || quizzesDone) {
-                statusSpan.textContent = 'Partially Done';
-                statusSpan.classList.add('incomplete'); // Using 'incomplete' for partial too, or add 'partial'
-            } else {
-                statusSpan.textContent = 'Not Started';
-                statusSpan.classList.add('incomplete');
-            }
-        }
-
-        function updateSubjectCompletionVisuals() {
-            const currentLevel = cfaLevelSelect.value;
-            const subjectsForLevel = subjectProgress[currentLevel] || [];
-            
-            let fullyCompletedSubjects = 0;
-            if (subjectsForLevel.length > 0) {
-                subjectsForLevel.forEach(subject => {
-                    if (subject.flashcards && subject.quizzes) {
-                        fullyCompletedSubjects++;
-                    }
-                });
-            }
-
-            const totalSubjects = subjectsForLevel.length;
-            const completionPercentage = totalSubjects > 0 ? (fullyCompletedSubjects / totalSubjects) * 100 : 0;
-            
-            let feedbackText = `${fullyCompletedSubjects} out of ${totalSubjects} subjects fully completed. (${completionPercentage.toFixed(0)}%)`;
-            subjectCompletionFeedback.textContent = feedbackText;
-
-            if (completionPercentage >= currentCfaLevelData.TARGET_SUBJECT_COMPLETION_PERCENT) {
-                subjectCompletionFeedback.style.color = 'var(--success-color)';
-                checkpointSubjects.classList.add('met');
-            } else if (completionPercentage >= currentCfaLevelData.TARGET_SUBJECT_COMPLETION_PERCENT * 0.5) {
-                subjectCompletionFeedback.style.color = 'var(--warning-color)';
-                checkpointSubjects.classList.remove('met');
-            } else {
-                subjectCompletionFeedback.style.color = 'var(--danger-color)';
-                checkpointSubjects.classList.remove('met');
-            }
-        }
-
-        function updateOverallAssessment() {
-            const time = parseInt(timeInput.value) || 0;
-            const progress = parseInt(progressInput.value) || 0;
-            const practice = parseInt(practiceInput.value) || 0;
-            const proficiency = parseInt(proficiencyInput.value) || 0;
-            
-            const currentLevel = cfaLevelSelect.value;
-            const subjectsForLevel = subjectProgress[currentLevel] || [];
-            let fullyCompletedSubjects = 0;
-            if (subjectsForLevel.length > 0) {
-                subjectsForLevel.forEach(subject => {
-                    if (subject.flashcards && subject.quizzes) {
-                        fullyCompletedSubjects++;
-                    }
-                });
-            }
-            const totalSubjects = subjectsForLevel.length;
-            const subjectCompletionPercentage = totalSubjects > 0 ? (fullyCompletedSubjects / totalSubjects) * 100 : 0;
-
-
-            const isTimeMet = time >= currentCfaLevelData.RECOMMENDED_TIME_HOURS;
-            const isProgressMet = progress >= currentCfaLevelData.READY_PROGRESS_THRESHOLD;
-            const isPracticeMet = practice >= currentCfaLevelData.RECOMMENDED_PRACTICE_QUESTIONS;
-            const isProficiencyMet = proficiency >= currentCfaLevelData.TARGET_PROFICIENCY_SCORE;
-            const isSubjectsMet = subjectCompletionPercentage >= currentCfaLevelData.TARGET_SUBJECT_COMPLETION_PERCENT;
-
-            let messages = [];
-            let allMet = true;
-
-            if (!isTimeMet) {
-                messages.push(`<strong>Time:</strong> Dedicate at least ${currentCfaLevelData.RECOMMENDED_TIME_HOURS - time} more hours (Recommended: ${currentCfaLevelData.RECOMMENDED_TIME_HOURS}).`);
-                allMet = false;
-            }
-            if (!isProgressMet) {
-                messages.push(`<strong>Curriculum Progress:</strong> Complete at least ${Math.max(0, currentCfaLevelData.READY_PROGRESS_THRESHOLD - progress)}% more of the curriculum (Aim for 100%, minimum ${currentCfaLevelData.READY_PROGRESS_THRESHOLD}% for readiness).`);
-                allMet = false;
-            }
-            if (!isPracticeMet) {
-                messages.push(`<strong>Practice Questions:</strong> Attempt at least ${currentCfaLevelData.RECOMMENDED_PRACTICE_QUESTIONS - practice} more questions (Recommended: ${currentCfaLevelData.RECOMMENDED_PRACTICE_QUESTIONS}).`);
-                allMet = false;
-            }
-            if (!isProficiencyMet) {
-                messages.push(`<strong>Proficiency:</strong> Improve average score to ${currentCfaLevelData.TARGET_PROFICIENCY_SCORE}% or higher (Current: ${proficiency}%).`);
-                allMet = false;
-            }
-             if (!isSubjectsMet) {
-                messages.push(`<strong>Subject Coverage:</strong> Fully complete flashcards and quizzes for at least ${Math.ceil(currentCfaLevelData.TARGET_SUBJECT_COMPLETION_PERCENT / 100 * totalSubjects)} out of ${totalSubjects} subjects (Current: ${fullyCompletedSubjects}).`);
-                allMet = false;
-            }
-
-
-            overallAssessmentDiv.classList.remove('ready', 'not-ready');
-
-            // Check if any input has a value, including any subject checkbox
-            const anyInputFilled = timeInput.value || progressInput.value || practiceInput.value || proficiencyInput.value || 
-                                   Object.values(subjectProgress[currentLevel] || {}).some(subj => subj.flashcards || subj.quizzes);
-
-            if (allMet && anyInputFilled) {
-                assessmentStatus.textContent = 'Ready for the Exam!';
-                overallAssessmentDiv.classList.add('ready');
-                assessmentDetails.innerHTML = '<p>Congratulations! You appear to have met all key targets.</p>';
-            } else if (!anyInputFilled) {
-                assessmentStatus.textContent = 'Enter your data above';
-                assessmentDetails.innerHTML = '<p>Input your study metrics to see your readiness assessment.</p>';
-                overallAssessmentDiv.className = 'overall-assessment'; // Reset class
-            } else {
-                assessmentStatus.textContent = 'Needs More Preparation';
-                overallAssessmentDiv.classList.add('not-ready');
-                let detailsHtml = '<p>Focus on these areas to improve your readiness:</p><ul>';
-                messages.forEach(msg => {
-                    detailsHtml += `<li>${msg}</li>`;
-                });
-                detailsHtml += '</ul>';
-                assessmentDetails.innerHTML = detailsHtml;
-            }
-        }
-
-        function updateAllVisuals() {
-            updateTimeVisuals();
-            updateProgressVisuals();
-            updatePracticeVisuals();
-            updateProficiencyVisuals();
-            updateSubjectCompletionVisuals(); // New visual update for subjects
-            updateOverallAssessment();
-        }
-
-        function resetApp() {
-            // Reset input fields
-            timeInput.value = '';
-            progressInput.value = '';
-            practiceInput.value = '';
-            proficiencyInput.value = '';
-            cfaLevelSelect.value = 'I'; // Reset to Level I
-
-            // Clear all stored subject progress
-            subjectProgress = {};
-            
-            // Re-initialize and update visuals for the default level
-            updateCfaLevelAndVisuals(); 
-            studyTipOutput.textContent = "Click 'Generate Tip' to get a personalized study recommendation!"; // Reset tip output
-            studyTipOutput.classList.remove('loading');
-        }
-
-        /**
-         * Generates a personalized study tip using the Gemini API based on current user metrics.
-         */
-        async function generateStudyTip() {
-            studyTipOutput.textContent = 'Generating your personalized tip... ✨';
-            studyTipOutput.classList.add('loading');
-            generateTipButton.disabled = true; // Disable button while generating
-
-            const currentLevel = cfaLevelSelect.value;
-            const time = parseInt(timeInput.value) || 0;
-            const progress = parseInt(progressInput.value) || 0;
-            const practice = parseInt(practiceInput.value) || 0;
-            const proficiency = parseInt(proficiencyInput.value) || 0;
-
-            const subjectsForLevel = subjectProgress[currentLevel] || [];
-            let fullyCompletedSubjects = 0;
-            if (subjectsForLevel.length > 0) {
-                subjectsForLevel.forEach(subject => {
-                    if (subject.flashcards && subject.quizzes) {
-                        fullyCompletedSubjects++;
-                    }
-                });
-            }
-            const totalSubjects = subjectsForLevel.length;
-            const subjectCompletionPercentage = totalSubjects > 0 ? (fullyCompletedSubjects / totalSubjects) * 100 : 0;
-
-            // Constructing a detailed prompt for the LLM
-            const prompt = `You are an AI tutor for the CFA exam. Your goal is to provide a concise, actionable, and encouraging study tip (2-3 sentences max).
-            The user is currently studying for CFA Level ${currentLevel}.
-            Their study metrics are:
-            - Time Dedicated: ${time} hours (Recommended: ${currentCfaLevelData.RECOMMENDED_TIME_HOURS} hours)
-            - Curriculum Progress: ${progress}% (Target for readiness: ${currentCfaLevelData.READY_PROGRESS_THRESHOLD}%)
-            - Practice Questions: ${practice} attempted (Recommended: ${currentCfaLevelData.RECOMMENDED_PRACTICE_QUESTIONS} questions)
-            - Average Practice Exam Score: ${proficiency}% (Target for good proficiency: ${currentCfaLevelData.TARGET_PROFICIENCY_SCORE}%)
-            - Subject Completion: ${fullyCompletedSubjects} out of ${totalSubjects} subjects fully completed (${subjectCompletionPercentage.toFixed(0)}%) (Target: ${currentCfaLevelData.TARGET_SUBJECT_COMPLETION_PERCENT}%)
-
-            Based on these metrics, identify the area(s) needing the most attention or reinforcement. Provide a specific, positive, and actionable tip. If all areas seem good, offer a tip on advanced strategies, deep dives, or maintaining momentum.`;
-
-            let chatHistory = [];
-            chatHistory.push({ role: "user", parts: [{ text: prompt }] });
-            const payload = { contents: chatHistory };
-            const apiKey = ""; // Leave this as-is; Canvas will provide the key at runtime.
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
-
-            try {
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-
-                const result = await response.json();
-                if (result.candidates && result.candidates.length > 0 &&
-                    result.candidates[0].content && result.candidates[0].content.parts &&
-                    result.candidates[0].content.parts.length > 0) {
-                    const text = result.candidates[0].content.parts[0].text;
-                    studyTipOutput.textContent = text;
-                    studyTipOutput.style.color = 'var(--text-color)'; // Reset text color
-                    studyTipOutput.style.fontStyle = 'normal'; // Reset font style
-                } else {
-                    studyTipOutput.textContent = 'Could not generate a tip. Please try again.';
-                    studyTipOutput.style.color = 'var(--danger-color)';
-                }
-            } catch (error) {
-                console.error('Error calling Gemini API:', error);
-                studyTipOutput.textContent = 'Failed to generate tip due to an API error. Please check your connection or try again later.';
-                studyTipOutput.style.color = 'var(--danger-color)';
-            } finally {
-                studyTipOutput.classList.remove('loading');
-                generateTipButton.disabled = false; // Re-enable button
-            }
-        }
-
-        // Initial render on page load
-        document.addEventListener('DOMContentLoaded', () => {
-            updateCfaLevelAndVisuals(); // Initialize with Level I data and update all visuals
-        });
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
