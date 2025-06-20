@@ -1,66 +1,37 @@
 document.addEventListener('DOMContentLoaded', async () => {
-    // --- DOM Elements ---
-    const explanationTitleElement = document.getElementById('explanation-title');
-    const cfaLevelDisplayElement = document.getElementById('cfa-level-display');
-    const aiExplanationOutput = document.getElementById('ai-explanation-output');
-    const aiError = document.getElementById('ai-error');
-    const backToSubjectDetailButton = document.getElementById('back-to-subject-detail');
+    // ... (existing DOM Elements and Helper Functions from explanation-page.js) ...
 
     // --- Backend Proxy URL (IMPORTANT: REPLACE WITH YOUR DEPLOYED BACKEND URL) ---
     // Example: 'https://your-backend-proxy.onrender.com/api/explain-cfa-topic'
     const AI_BACKEND_URL_EXPLAIN_TOPIC = 'YOUR_DEPLOYED_BACKEND_URL/api/explain-cfa-topic';
 
-    // --- Helper Functions ---
+    // --- Helper Functions (keep existing parseMarkdownToHtml, addSlide, parseError) ---
 
-    /**
-     * Parses markdown text into HTML. Requires marked.js to be loaded.
-     * @param {string} markdownText
-     * @returns {Promise<string>}
-     */
-    async function parseMarkdownToHtml(markdownText) {
-        if (typeof marked === 'undefined') {
-            console.error("Marked.js library not loaded. Please include <script src='https://cdn.jsdelivr.net/npm/marked/marked.min.js'></script> in your HTML.");
-            return markdownText; // Return original text if marked.js is not available
+    // NEW: Function to fetch static Markdown explanation
+    async function fetchStaticExplanation(level, subject) {
+        // Encode the subject name to handle spaces and special characters in filenames
+        const encodedSubject = encodeURIComponent(subject);
+        // Construct the path to your Markdown file
+        const filePath = `explanations/level-${level}/${encodedSubject}.md`;
+
+        try {
+            const response = await fetch(filePath);
+            if (!response.ok) {
+                // If file not found (404), throw a specific error to try AI
+                if (response.status === 404) {
+                    throw new Error("STATIC_FILE_NOT_FOUND");
+                }
+                throw new Error(`Failed to fetch static explanation: ${response.statusText}`);
+            }
+            const markdownContent = await response.text();
+            return { type: 'static', content: markdownContent };
+        } catch (error) {
+            console.warn(`Could not load static explanation for ${subject}:`, error.message);
+            // Re-throw or return an indication that static content failed
+            throw error; // Let the caller decide what to do
         }
-        return marked.parse(markdownText);
     }
 
-    /**
-     * Adds a slide (text and/or image) to the AI explanation output.
-     * @param {string} text
-     * @param {HTMLImageElement|null} image
-     */
-    async function addSlide(text, image) {
-        const slide = document.createElement('div');
-        slide.className = 'slide';
-
-        if (text) {
-            const caption = document.createElement('div');
-            caption.innerHTML = await parseMarkdownToHtml(text);
-            slide.append(caption);
-        }
-
-        if (image) {
-            slide.prepend(image);
-        }
-
-        aiExplanationOutput.append(slide);
-        aiExplanationOutput.scrollTop = aiExplanationOutput.scrollHeight; // Scroll to bottom
-    }
-
-    /**
-     * Parses errors from the backend response.
-     * @param {any} error
-     * @returns {string}
-     */
-    function parseError(error) {
-        if (typeof error === 'object' && error !== null) {
-            if (error.details) return error.details;
-            if (error.error) return error.error;
-            if (error.message) return error.message;
-        }
-        return String(error);
-    }
 
     // --- Main Logic for Explanation Page ---
     const params = new URLSearchParams(window.location.search);
@@ -76,8 +47,8 @@ document.addEventListener('DOMContentLoaded', async () => {
         // Set the back button link
         backToSubjectDetailButton.href = `subject-detail.html?level=${level}&subject=${encodeURIComponent(subject)}`;
 
-        // Call the AI explanation function
-        await explainCFA(decodedSubject);
+        // Call the explanation function, now prioritizing static content
+        await getExplanationContent(level, decodedSubject);
 
     } else {
         explanationTitleElement.textContent = "Error: Subject or Level Missing";
@@ -88,7 +59,43 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     /**
-     * Calls the backend to explain a specific CFA topic.
+     * Gets explanation content, prioritizing static Markdown files, then falling back to AI.
+     * @param {string} level - The CFA level.
+     * @param {string} topic - The CFA topic to explain.
+     */
+    async function getExplanationContent(level, topic) {
+        aiExplanationOutput.innerHTML = '<p class="loading">Loading explanation...</p>';
+        aiExplanationOutput.classList.add('loading');
+        aiError.toggleAttribute('hidden', true);
+
+        try {
+            // First, try to load from a static Markdown file
+            const staticResult = await fetchStaticExplanation(level, topic);
+            aiExplanationOutput.innerHTML = ''; // Clear loading message
+            aiExplanationOutput.classList.remove('loading');
+            aiExplanationOutput.innerHTML = await parseMarkdownToHtml(staticResult.content);
+
+        } catch (staticError) {
+            // If static content failed (especially a 404), fall back to AI
+            if (staticError.message === "STATIC_FILE_NOT_FOUND" || !staticError.message.includes("Failed to fetch")) {
+                console.info(`Static explanation not found for ${topic}. Falling back to AI generation.`);
+                await explainCFA(topic); // Call the AI function
+            } else {
+                // For other network/fetch errors with static content, report it
+                const msg = parseError(staticError);
+                aiError.innerHTML = `Error loading explanation: ${msg}`;
+                aiError.removeAttribute('hidden');
+                aiExplanationOutput.innerHTML = '<p class="loading" style="color: var(--danger-color);">Error loading static explanation.</p>';
+                aiExplanationOutput.classList.remove('loading');
+                console.error('Frontend error loading static explanation:', staticError);
+            }
+        }
+    }
+
+
+    /**
+     * Calls the backend to generate a dynamic AI explanation for a specific CFA topic.
+     * This function is now only called if a static file is not found.
      * @param {string} topic - The CFA topic to explain.
      */
     async function explainCFA(topic) {
@@ -97,8 +104,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             return;
         }
 
-        // Show loading state
-        aiExplanationOutput.innerHTML = '<p class="loading">Generating explanation with illustrations...</p>';
+        // Show AI generation loading state
+        aiExplanationOutput.innerHTML = '<p class="loading">Generating explanation with AI illustrations...</p>';
         aiExplanationOutput.classList.add('loading');
         aiError.toggleAttribute('hidden', true);
 
@@ -146,7 +153,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         } catch (e) {
             const msg = parseError(e);
-            aiError.innerHTML = `Something went wrong: ${msg}`;
+            aiError.innerHTML = `Something went wrong with AI generation: ${msg}`;
             aiError.removeAttribute('hidden');
             aiExplanationOutput.innerHTML = ''; // Clear output on error
             aiExplanationOutput.classList.remove('loading');
