@@ -1,4 +1,35 @@
 document.addEventListener('DOMContentLoaded', async () => {
+    // --- DOM Elements ---
+    const explanationTitleElement = document.getElementById('explanation-title'); // <-- This line
+    const cfaLevelDisplayElement = document.getElementById('cfa-level-display');
+    const aiExplanationOutput = document.getElementById('ai-explanation-output');
+    const aiError = document.getElementById('ai-error');
+    const backToSubjectDetailButton = document.getElementById('back-to-subject-detail');
+
+    // --- Ensure the AI error element is hidden initially ---
+    aiError.setAttribute('hidden', true);
+    // --- Ensure the AI explanation output is empty initially ---
+    aiExplanationOutput.innerHTML = ''; // Clear any previous content
+    aiExplanationOutput.classList.remove('loading'); // Remove loading class if it was set previously
+    // --- Ensure the back button is visible ---
+    backToSubjectDetailButton.style.display = 'inline-block'; // Show the back button
+    // --- Ensure the explanation title is set correctly ---
+    explanationTitleElement.textContent = "Loading Explanation..."; // Set initial title
+    document.title = "CFA Explanation Page"; // Set initial page title                  
+    // --- Import Helper Functions ---
+    import { parseMarkdownToHtml, addSlide, parseError } from './explanation-page-helpers.js';
+    // --- Import Helper Functions ---                                                                              
+    // This file contains the parseMarkdownToHtml, addSlide, and parseError functions
+    // which are used to handle Markdown parsing, slide creation, and error formatting.
+    import { parseMarkdownToHtml, addSlide, parseError } from './explanation-page-helpers.js';
+    // This file contains the parseMarkdownToHtml, addSlide, and parseError functions
+    // which are used to handle Markdown parsing, slide creation, and error formatting.
+    // --- Import Helper Functions ---
+    // This file contains the parseMarkdownToHtml, addSlide, and parseError functions
+    // which are used to handle Markdown parsing, slide creation, and error formatting.
+    import { parseMarkdownToHtml, addSlide, parseError } from './explanation-page-helpers.js';
+    // This file contains the parseMarkdownToHtml, addSlide, and parseError functions
+    // which are used to handle Markdown parsing, slide creation, and error formatting.             
     // ... (existing DOM Elements and Helper Functions from explanation-page.js) ...
 
     // --- Backend Proxy URL (IMPORTANT: REPLACE WITH YOUR DEPLOYED BACKEND URL) ---
