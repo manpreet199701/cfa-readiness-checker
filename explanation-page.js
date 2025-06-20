@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     document.title = "CFA Explanation Page";
 
     // --- Backend Proxy URL ---
-    const AI_BACKEND_URL_EXPLAIN_TOPIC = 'http://127.0.0.1:8080/explanation.html?level=I&subject=Portfolio%20Management%20and%20Wealth%20Management';
+    const AI_BACKEND_URL_EXPLAIN_TOPIC = 'http://localhost:3000/api/explain-cfa-topic';
 
     // --- fetchStaticExplanation Function ---
     async function fetchStaticExplanation(level, subject) {
